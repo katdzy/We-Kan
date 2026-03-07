@@ -1,6 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 
 export interface Subtask {
   id: string;
@@ -30,143 +32,30 @@ export interface Column {
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
-  columns = signal<Column[]>([
-    {
-      id: 'backlog',
-      title: 'Backlog',
-      color: '#6b7280',
-      cards: [
-        {
-          id: 'c1',
-          title: 'Research competitors',
-          description: 'Analyze top 5 competitors in the market.',
-          priority: 'low',
-          tag: 'Research',
-          subtasks: [
-            { id: 's1', title: 'Identify top 5 competitors', done: true },
-            { id: 's2', title: 'Analyze pricing models', done: false },
-            { id: 's3', title: 'Document findings', done: false },
-          ],
-        },
-        {
-          id: 'c2',
-          title: 'Write API docs',
-          description: 'Document all REST endpoints with examples.',
-          priority: 'medium',
-          tag: 'Docs',
-          subtasks: [],
-        },
-      ],
-    },
-    {
-      id: 'todo',
-      title: 'To Do',
-      color: '#3b82f6',
-      cards: [
-        {
-          id: 'c3',
-          title: 'Design login screen',
-          description: 'Create wireframes and high-fidelity mockups.',
-          priority: 'high',
-          tag: 'Design',
-          subtasks: [
-            { id: 's4', title: 'Sketch wireframes', done: true },
-            { id: 's5', title: 'Create hi-fi mockup in Figma', done: true },
-            { id: 's6', title: 'Get design review', done: false },
-            { id: 's7', title: 'Handoff to dev', done: false },
-          ],
-        },
-        {
-          id: 'c4',
-          title: 'Set up CI/CD pipeline',
-          description: 'Configure GitHub Actions for automated deploys.',
-          priority: 'medium',
-          tag: 'DevOps',
-          subtasks: [
-            { id: 's8', title: 'Create workflow YAML', done: false },
-            { id: 's9', title: 'Add build & test steps', done: false },
-          ],
-        },
-        {
-          id: 'c5',
-          title: 'Write unit tests',
-          description: 'Achieve 80% code coverage for core modules.',
-          priority: 'medium',
-          tag: 'Testing',
-          subtasks: [],
-        },
-      ],
-    },
-    {
-      id: 'in-progress',
-      title: 'In Progress',
-      color: '#f59e0b',
-      cards: [
-        {
-          id: 'c6',
-          title: 'Build kanban board',
-          description: 'Implement drag-and-drop with Angular signals.',
-          priority: 'high',
-          tag: 'Feature',
-          subtasks: [
-            { id: 's10', title: 'Column layout', done: true },
-            { id: 's11', title: 'Drag & drop', done: true },
-            { id: 's12', title: 'Add card modal', done: true },
-            { id: 's13', title: 'Subtasks & progress', done: false },
-          ],
-        },
-        {
-          id: 'c7',
-          title: 'Refactor auth service',
-          description: 'Migrate to JWT-based authentication flow.',
-          priority: 'high',
-          tag: 'Backend',
-          subtasks: [
-            { id: 's14', title: 'Audit current auth code', done: true },
-            { id: 's15', title: 'Implement JWT middleware', done: false },
-            { id: 's16', title: 'Update tests', done: false },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'done',
-      title: 'Done',
-      color: '#10b981',
-      cards: [
-        {
-          id: 'c8',
-          title: 'Project kickoff',
-          description: 'Initial team meeting and goal setting.',
-          priority: 'low',
-          tag: 'Management',
-          subtasks: [
-            { id: 's17', title: 'Schedule kickoff meeting', done: true },
-            { id: 's18', title: 'Define project goals', done: true },
-          ],
-        },
-        {
-          id: 'c9',
-          title: 'Set up repo',
-          description: 'Initialize monorepo with Angular and Node.',
-          priority: 'low',
-          tag: 'Setup',
-          subtasks: [
-            { id: 's19', title: 'Create GitHub repo', done: true },
-            { id: 's20', title: 'Configure workspace', done: true },
-            { id: 's21', title: 'Add README', done: true },
-          ],
-        },
-      ],
-    },
-  ]);
+export class App implements OnInit {
+  private supabase = inject(SupabaseService);
+  authService = inject(AuthService);
 
+  // ── Board state ───────────────────────────────────────────────────────────
+  columns = signal<Column[]>([]);
+  loading = signal(true);
+  error = signal<string | null>(null);
+
+  // ── Auth UI state ─────────────────────────────────────────────────────────
+  authMode = signal<'login' | 'signup'>('login');
+  authEmail = signal('');
+  authPassword = signal('');
+  authError = signal<string | null>(null);
+  authLoading = signal(false);
+  /** True after sign-up until user confirms their email (if confirmation required) */
+  signupConfirmPending = signal(false);
+
+  // ── Drag state ────────────────────────────────────────────────────────────
   draggingCard = signal<{ card: Card; fromColumnId: string } | null>(null);
   dragOverColumnId = signal<string | null>(null);
   dragOverCardId = signal<string | null>(null);
 
-  // Add card modal state
+  // ── Add card modal ────────────────────────────────────────────────────────
   showAddModal = signal(false);
   addingToColumnId = signal<string | null>(null);
   newCard = signal<Partial<Card> & { subtasks: Subtask[] }>({
@@ -174,7 +63,7 @@ export class App {
   });
   newSubtaskText = signal('');
 
-  // Edit card modal state
+  // ── Edit card modal ───────────────────────────────────────────────────────
   showEditModal = signal(false);
   editingCard = signal<{ card: Card; columnId: string } | null>(null);
   editCard = signal<Partial<Card> & { subtasks: Subtask[] }>({ subtasks: [] });
@@ -182,6 +71,95 @@ export class App {
 
   totalCards = computed(() => this.columns().reduce((sum, col) => sum + col.cards.length, 0));
 
+  constructor() {
+    // When session changes (login / logout), load or clear board
+    effect(() => {
+      const session = this.authService.session();
+      if (session) {
+        this.loadBoard();
+      } else {
+        this.columns.set([]);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  async ngOnInit() {
+    // Initial load is handled by the effect above once session resolves
+  }
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  setAuthMode(mode: 'login' | 'signup') {
+    this.authMode.set(mode);
+    this.authError.set(null);
+    this.signupConfirmPending.set(false);
+  }
+
+  async submitAuth() {
+    const email = this.authEmail().trim();
+    const password = this.authPassword();
+    if (!email || !password) return;
+
+    this.authLoading.set(true);
+    this.authError.set(null);
+
+    try {
+      if (this.authMode() === 'signup') {
+        await this.authService.signUp(email, password);
+        // Supabase may require email confirmation; check if session was set
+        const session = this.authService.session();
+        if (!session) {
+          // Email confirmation is required
+          this.signupConfirmPending.set(true);
+        }
+        // If session was set automatically, the effect will call loadBoard.
+        // Seed default columns for the new user (only if we have a session).
+        if (session) {
+          const cols = await this.supabase.seedDefaultColumns(session.user.id);
+          this.columns.set(cols);
+        }
+      } else {
+        await this.authService.signIn(email, password);
+        // effect() will call loadBoard()
+      }
+    } catch (err: any) {
+      this.authError.set(err?.message ?? 'Authentication failed');
+    } finally {
+      this.authLoading.set(false);
+    }
+  }
+
+  async signOut() {
+    await this.authService.signOut();
+    // effect() will clear columns automatically
+  }
+
+  // ── Board load ────────────────────────────────────────────────────────────
+  async loadBoard() {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const cols = await this.supabase.loadBoard();
+      // If brand new user with no columns, seed them
+      if (cols.length === 0) {
+        const userId = this.authService.user()?.id;
+        if (userId) {
+          const seeded = await this.supabase.seedDefaultColumns(userId);
+          this.columns.set(seeded);
+        } else {
+          this.columns.set([]);
+        }
+      } else {
+        this.columns.set(cols);
+      }
+    } catch (err: any) {
+      this.error.set(err?.message ?? 'Failed to load board');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // ── Card utilities ────────────────────────────────────────────────────────
   progress(card: Card): number {
     if (!card.subtasks.length) return 0;
     return Math.round((card.subtasks.filter((s) => s.done).length / card.subtasks.length) * 100);
@@ -191,30 +169,28 @@ export class App {
     return card.subtasks.filter((s) => s.done).length;
   }
 
-  // ── Subtask toggling on card ──────────────────
   toggleSubtask(cardId: string, columnId: string, subtaskId: string) {
+    let newDone = false;
     this.columns.update((cols) =>
       cols.map((col) =>
-        col.id !== columnId
-          ? col
-          : {
-            ...col,
-            cards: col.cards.map((c) =>
-              c.id !== cardId
-                ? c
-                : {
-                  ...c,
-                  subtasks: c.subtasks.map((s) =>
-                    s.id === subtaskId ? { ...s, done: !s.done } : s
-                  ),
-                }
-            ),
-          }
+        col.id !== columnId ? col : {
+          ...col,
+          cards: col.cards.map((c) =>
+            c.id !== cardId ? c : {
+              ...c,
+              subtasks: c.subtasks.map((s) => {
+                if (s.id === subtaskId) { newDone = !s.done; return { ...s, done: newDone }; }
+                return s;
+              }),
+            }
+          ),
+        }
       )
     );
+    this.supabase.toggleSubtask(subtaskId, newDone).catch((err) => console.error('toggleSubtask', err));
   }
 
-  // ── Add card modal ────────────────────────────
+  // ── Add card modal ────────────────────────────────────────────────────────
   openAddModal(columnId: string) {
     this.addingToColumnId.set(columnId);
     this.newCard.set({ title: '', description: '', priority: 'medium', tag: '', subtasks: [] });
@@ -241,7 +217,7 @@ export class App {
     this.newCard.update((c) => ({ ...c, subtasks: c.subtasks.filter((s) => s.id !== id) }));
   }
 
-  submitAddCard() {
+  async submitAddCard() {
     const card = this.newCard();
     if (!card.title?.trim()) return;
     const columnId = this.addingToColumnId();
@@ -256,15 +232,27 @@ export class App {
       subtasks: card.subtasks ?? [],
     };
 
+    let position = 0;
     this.columns.update((cols) =>
-      cols.map((col) =>
-        col.id === columnId ? { ...col, cards: [...col.cards, newCardObj] } : col
-      )
+      cols.map((col) => {
+        if (col.id !== columnId) return col;
+        position = col.cards.length;
+        return { ...col, cards: [...col.cards, newCardObj] };
+      })
     );
     this.closeAddModal();
+
+    this.supabase.addCard(columnId, newCardObj, position).catch((err) => {
+      console.error('addCard', err);
+      this.columns.update((cols) =>
+        cols.map((col) =>
+          col.id === columnId ? { ...col, cards: col.cards.filter((c) => c.id !== newCardObj.id) } : col
+        )
+      );
+    });
   }
 
-  // ── Edit card modal ───────────────────────────
+  // ── Edit card modal ───────────────────────────────────────────────────────
   openEditModal(card: Card, columnId: string) {
     this.editingCard.set({ card, columnId });
     this.editCard.set({ ...card, subtasks: card.subtasks.map((s) => ({ ...s })) });
@@ -298,54 +286,80 @@ export class App {
     }));
   }
 
-  submitEditCard() {
+  async submitEditCard() {
     const editing = this.editingCard();
     const updated = this.editCard();
     if (!editing || !updated.title?.trim()) return;
 
+    const updatedCard: Card = {
+      ...editing.card,
+      title: updated.title!.trim(),
+      description: updated.description?.trim() ?? '',
+      priority: updated.priority as 'low' | 'medium' | 'high',
+      tag: updated.tag?.trim() ?? '',
+      subtasks: updated.subtasks ?? [],
+    };
+    const previousCard = editing.card;
+
     this.columns.update((cols) =>
       cols.map((col) =>
         col.id === editing.columnId
-          ? {
-            ...col,
-            cards: col.cards.map((c) =>
-              c.id === editing.card.id
-                ? {
-                  ...c,
-                  title: updated.title!.trim(),
-                  description: updated.description?.trim() ?? '',
-                  priority: updated.priority as 'low' | 'medium' | 'high',
-                  tag: updated.tag?.trim() ?? '',
-                  subtasks: updated.subtasks ?? [],
-                }
-                : c
-            ),
-          }
+          ? { ...col, cards: col.cards.map((c) => c.id === editing.card.id ? updatedCard : c) }
           : col
       )
     );
     this.closeEditModal();
+
+    try {
+      await this.supabase.updateCard(updatedCard);
+      await this.supabase.syncSubtasks(updatedCard.id, updatedCard.subtasks);
+    } catch (err) {
+      console.error('submitEditCard', err);
+      this.columns.update((cols) =>
+        cols.map((col) =>
+          col.id === editing.columnId
+            ? { ...col, cards: col.cards.map((c) => c.id === previousCard.id ? previousCard : c) }
+            : col
+        )
+      );
+    }
   }
 
   deleteCard(cardId: string, columnId: string) {
+    let removedCard: Card | undefined;
+    let removedIndex = 0;
     this.columns.update((cols) =>
-      cols.map((col) =>
-        col.id === columnId ? { ...col, cards: col.cards.filter((c) => c.id !== cardId) } : col
-      )
+      cols.map((col) => {
+        if (col.id !== columnId) return col;
+        removedIndex = col.cards.findIndex((c) => c.id === cardId);
+        removedCard = col.cards[removedIndex];
+        return { ...col, cards: col.cards.filter((c) => c.id !== cardId) };
+      })
     );
+    this.supabase.deleteCard(cardId).catch((err) => {
+      console.error('deleteCard', err);
+      if (removedCard) {
+        this.columns.update((cols) =>
+          cols.map((col) => {
+            if (col.id !== columnId) return col;
+            const cards = [...col.cards];
+            cards.splice(removedIndex, 0, removedCard!);
+            return { ...col, cards };
+          })
+        );
+      }
+    });
   }
 
-  // ── Drag and drop ─────────────────────────────
+  // ── Drag and drop ─────────────────────────────────────────────────────────
   onDragStart(event: DragEvent, card: Card, fromColumnId: string) {
     this.draggingCard.set({ card, fromColumnId });
     event.dataTransfer!.effectAllowed = 'move';
-    const el = event.target as HTMLElement;
-    el.classList.add('dragging');
+    (event.target as HTMLElement).classList.add('dragging');
   }
 
   onDragEnd(event: DragEvent) {
-    const el = event.target as HTMLElement;
-    el.classList.remove('dragging');
+    (event.target as HTMLElement).classList.remove('dragging');
     this.draggingCard.set(null);
     this.dragOverColumnId.set(null);
     this.dragOverCardId.set(null);
@@ -364,14 +378,17 @@ export class App {
     if (!dragging) return;
 
     const { card, fromColumnId } = dragging;
+    let newPosition = 0;
+
     this.columns.update((cols) => {
-      const newCols = cols.map((col) =>
+      const cleared = cols.map((col) =>
         col.id === fromColumnId ? { ...col, cards: col.cards.filter((c) => c.id !== card.id) } : col
       );
-      return newCols.map((col) => {
+      return cleared.map((col) => {
         if (col.id !== toColumnId) return col;
-        if (!targetCardId) return { ...col, cards: [...col.cards, card] };
+        if (!targetCardId) { newPosition = col.cards.length; return { ...col, cards: [...col.cards, card] }; }
         const targetIdx = col.cards.findIndex((c) => c.id === targetCardId);
+        newPosition = targetIdx;
         const newCards = [...col.cards];
         newCards.splice(targetIdx, 0, card);
         return { ...col, cards: newCards };
@@ -381,24 +398,15 @@ export class App {
     this.draggingCard.set(null);
     this.dragOverColumnId.set(null);
     this.dragOverCardId.set(null);
+
+    this.supabase.moveCard(card.id, toColumnId, newPosition).catch((err) => console.error('moveCard', err));
   }
 
-  updateNewCard(partial: Partial<Card>) {
-    this.newCard.update((c) => ({ ...c, ...partial }));
-  }
-
-  updateEditCard(partial: Partial<Card>) {
-    this.editCard.update((c) => ({ ...c, ...partial }));
-  }
-
-  onNewSubtaskKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter') { event.preventDefault(); this.addNewSubtask(); }
-  }
-
-  onEditSubtaskKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter') { event.preventDefault(); this.addEditSubtask(); }
-  }
-
+  // ── Misc helpers ──────────────────────────────────────────────────────────
+  updateNewCard(partial: Partial<Card>) { this.newCard.update((c) => ({ ...c, ...partial })); }
+  updateEditCard(partial: Partial<Card>) { this.editCard.update((c) => ({ ...c, ...partial })); }
+  onNewSubtaskKeydown(e: KeyboardEvent) { if (e.key === 'Enter') { e.preventDefault(); this.addNewSubtask(); } }
+  onEditSubtaskKeydown(e: KeyboardEvent) { if (e.key === 'Enter') { e.preventDefault(); this.addEditSubtask(); } }
   trackColumn(_: number, col: Column) { return col.id; }
   trackCard(_: number, card: Card) { return card.id; }
   trackSubtask(_: number, s: Subtask) { return s.id; }
