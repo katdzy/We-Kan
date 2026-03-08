@@ -8,6 +8,7 @@ export class AuthService {
 
   session = signal<Session | null>(null);
   user = computed<User | null>(() => this.session()?.user ?? null);
+  username = computed<string | null>(() => this.user()?.user_metadata?.['display_name'] ?? null);
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
@@ -35,6 +36,23 @@ export class AuthService {
 
   async signOut(): Promise<void> {
     const { error } = await this.supabase.auth.signOut();
+    if (error) throw error;
+  }
+
+  async updateEmail(email: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({ email });
+    if (error) throw error;
+  }
+
+  async updatePassword(password: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({ password });
+    if (error) throw error;
+  }
+
+  async updateUsername(username: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({
+      data: { display_name: username }
+    });
     if (error) throw error;
   }
 }

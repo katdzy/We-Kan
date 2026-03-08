@@ -49,10 +49,10 @@ interface SubtaskRow {
 
 // Default columns seeded for new users
 const DEFAULT_COLUMNS = [
-  { title: 'Backlog',     color: '#6b7280' },
-  { title: 'To Do',       color: '#3b82f6' },
+  { title: 'To Do', color: '#3b82f6' },
   { title: 'In Progress', color: '#f59e0b' },
-  { title: 'Done',        color: '#10b981' },
+  { title: 'To Review', color: '#6b7280' },
+  { title: 'Done', color: '#10b981' },
 ];
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -106,12 +106,49 @@ export class SupabaseService {
       });
     }
 
-    return (colRows as ColumnRow[]).map((col) => ({
+    const columns = (colRows as ColumnRow[]).map((col) => ({
       id: col.id,
       title: col.title,
       color: col.color,
       cards: cardsByCol.get(col.id) ?? [],
     }));
+
+    // Backwards compatibility migration: rename 'Backlog' to 'To Review' and ensure correct order
+    let needsUpdate = false;
+    const targetOrder = ['To Do', 'In Progress', 'To Review', 'Done'];
+
+    for (const col of columns) {
+      if (col.title === 'Backlog') {
+        col.title = 'To Review';
+        needsUpdate = true;
+      }
+    }
+
+    // Check if the current order of the default columns matches our target order
+    const isOrdered = columns.slice(0, 4).every((c, i) => c.title === targetOrder[i]);
+    if (!isOrdered || needsUpdate) {
+      columns.sort((a, b) => {
+        const indexA = targetOrder.indexOf(a.title);
+        const indexB = targetOrder.indexOf(b.title);
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return 0;
+      });
+
+      // Update positions in the database
+      const updates = columns.map((col, index) => ({
+        id: col.id,
+        board_id: boardId,
+        title: col.title,
+        color: col.color,
+        position: index,
+      }));
+      
+      this.supabase.from('columns').upsert(updates, { onConflict: 'id' }).then();
+    }
+
+    return columns;
   }
 
   // ── Seed default columns for a new board ────────────────────────────────────
@@ -216,20 +253,36 @@ export class SupabaseService {
   // ── Boards ──────────────────────────────────────────────────────────────────
   /** Gets all boards the user has access to, creating a default one if none exist. */
   async getAccessibleBoards(userId: string, email: string) {
+    // Fetch display_name from auth user metadata, fall back to email
+    const { data: { user: authUser } } = await this.supabase.auth.getUser();
+    const display_name = authUser?.user_metadata?.['display_name'] || email;
+
     const { data: boards, error: fetchErr } = await this.supabase
       .from('boards')
       .select('id, title, owner_id')
       .order('created_at', { ascending: true });
-    
+
     if (fetchErr) throw fetchErr;
 
     if (boards && boards.length > 0) {
+      // Keep the user's own board title in sync with their display_name
+      const ownBoard = boards.find(b => b.owner_id === userId);
+      if (ownBoard) {
+        const expectedTitle = `${display_name}'s Board`;
+        if (ownBoard.title !== expectedTitle) {
+          await this.supabase
+            .from('boards')
+            .update({ title: expectedTitle })
+            .eq('id', ownBoard.id);
+          ownBoard.title = expectedTitle;
+        }
+      }
       return boards;
     }
 
     const boardId = `${userId.slice(0, 8)}-board`;
     const { error } = await this.supabase.from('boards').upsert(
-      { id: boardId, title: `${email}'s Board`, owner_id: userId },
+      { id: boardId, title: `${display_name}'s Board`, owner_id: userId },
       { onConflict: 'id', ignoreDuplicates: true }
     );
     if (error) throw error;
@@ -241,7 +294,7 @@ export class SupabaseService {
     );
     if (memberErr) throw memberErr;
 
-    return [{ id: boardId, title: `${email}'s Board`, owner_id: userId }];
+    return [{ id: boardId, title: `${display_name}'s Board`, owner_id: userId }];
   }
 
   // ── Activity Logs ───────────────────────────────────────────────────────────

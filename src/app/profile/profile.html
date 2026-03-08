@@ -1,0 +1,96 @@
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>Profile</h2>
+        <button class="back-btn" routerLink="/">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Board
+        </button>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <div class="profile-info">
+                <div class="profile-field">
+                    <label>Email</label>
+                    <p>{{ authService.user()?.email }}</p>
+                </div>
+                <div class="profile-field">
+                    <label>Username</label>
+                    <p>{{ authService.username() || 'Not set' }}</p>
+                </div>
+                
+                <div class="divider"></div>
+
+                <div class="edit-section">
+                    <h3>Update Username</h3>
+                    <div class="input-group">
+                        <input type="text" placeholder="New username" [value]="newUsername()" (input)="newUsername.set($any($event.target).value)" class="profile-input" />
+                        <button class="btn-primary" (click)="updateUsername()" [disabled]="usernameLoading() || !newUsername().trim()">
+                            @if (usernameLoading()) {
+                                <span class="spinner"></span>
+                            } @else {
+                                Update Username
+                            }
+                        </button>
+                    </div>
+                    @if (usernameMessage()) {
+                        <div class="message" [class.success]="usernameMessage()?.type === 'success'" [class.error]="usernameMessage()?.type === 'error'">
+                            {{ usernameMessage()?.text }}
+                        </div>
+                    }
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="edit-section">
+                    <h3>Update Email</h3>
+                    <div class="input-group">
+                        <input type="email" placeholder="New email address" [value]="newEmail()" (input)="newEmail.set($any($event.target).value)" class="profile-input" />
+                        <button class="btn-primary" (click)="updateEmail()" [disabled]="emailLoading() || !newEmail().trim()">
+                            @if (emailLoading()) {
+                                <span class="spinner"></span>
+                            } @else {
+                                Update Email
+                            }
+                        </button>
+                    </div>
+                    @if (emailMessage()) {
+                        <div class="message" [class.success]="emailMessage()?.type === 'success'" [class.error]="emailMessage()?.type === 'error'">
+                            {{ emailMessage()?.text }}
+                        </div>
+                    }
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="edit-section">
+                    <h3>Change Password</h3>
+                    <div class="input-group">
+                        <input type="password" placeholder="New password (min 6 chars)" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" class="profile-input" />
+                        <button class="btn-primary" (click)="updatePassword()" [disabled]="passwordLoading() || newPassword().length < 6">
+                            @if (passwordLoading()) {
+                                <span class="spinner"></span>
+                            } @else {
+                                Update Password
+                            }
+                        </button>
+                    </div>
+                    @if (passwordMessage()) {
+                        <div class="message" [class.success]="passwordMessage()?.type === 'success'" [class.error]="passwordMessage()?.type === 'error'">
+                            {{ passwordMessage()?.text }}
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
