@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { SupabaseService } from './supabase.service';
+import { SupabaseService, ActivityLog, BoardMember } from './supabase.service';
 import { AuthService } from './auth.service';
 
 export interface Subtask {
@@ -37,9 +37,26 @@ export class App implements OnInit {
   authService = inject(AuthService);
 
   // ── Board state ───────────────────────────────────────────────────────────
+  activeBoard = signal<{ id: string; title: string; owner_id: string } | null>(null);
+  accessibleBoards = signal<{ id: string; title: string; owner_id: string }[]>([]);
   columns = signal<Column[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
+
+  isOwner = computed(() => {
+    const user = this.authService.user();
+    const board = this.activeBoard();
+    return !!(user && board && user.id === board.owner_id);
+  });
+
+  // ── Activity & Collab state ───────────────────────────────────────────────
+  activityLogs = signal<ActivityLog[]>([]);
+  boardMembers = signal<BoardMember[]>([]);
+  showActivityPanel = signal(false);
+  showInviteModal = signal(false);
+  inviteEmail = signal('');
+  inviteError = signal<string | null>(null);
+  inviteLoading = signal(false);
 
   // ── Auth UI state ─────────────────────────────────────────────────────────
   authMode = signal<'login' | 'signup'>('login');
@@ -78,7 +95,10 @@ export class App implements OnInit {
       if (session) {
         this.loadBoard();
       } else {
+        this.activeBoard.set(null);
         this.columns.set([]);
+        this.activityLogs.set([]);
+        this.boardMembers.set([]);
         this.loading.set(false);
       }
     });
@@ -112,12 +132,8 @@ export class App implements OnInit {
           // Email confirmation is required
           this.signupConfirmPending.set(true);
         }
-        // If session was set automatically, the effect will call loadBoard.
-        // Seed default columns for the new user (only if we have a session).
-        if (session) {
-          const cols = await this.supabase.seedDefaultColumns(session.user.id);
-          this.columns.set(cols);
-        }
+        // If session was set automatically, the effect will call loadBoard()
+        // which handles creating the board and default columns if needed.
       } else {
         await this.authService.signIn(email, password);
         // effect() will call loadBoard()
@@ -135,27 +151,126 @@ export class App implements OnInit {
   }
 
   // ── Board load ────────────────────────────────────────────────────────────
-  async loadBoard() {
+  async loadBoard(targetBoardId?: string) {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const cols = await this.supabase.loadBoard();
+      const user = this.authService.user();
+      if (!user) throw new Error('Not logged in');
+
+      // 1. Resolve accessible boards
+      const boards = await this.supabase.getAccessibleBoards(user.id, user.email ?? 'Unknown');
+      this.accessibleBoards.set(boards);
+      
+      let board = targetBoardId ? boards.find((b: any) => b.id === targetBoardId) : boards[0];
+      if (!board) board = boards[0];
+      
+      this.activeBoard.set(board);
+
+      // 2. Load columns, cards, subtasks
+      const cols = await this.supabase.loadBoard(board.id);
       // If brand new user with no columns, seed them
-      if (cols.length === 0) {
-        const userId = this.authService.user()?.id;
-        if (userId) {
-          const seeded = await this.supabase.seedDefaultColumns(userId);
-          this.columns.set(seeded);
-        } else {
-          this.columns.set([]);
-        }
+      if (cols.length === 0 && board.owner_id === user.id) {
+        const seeded = await this.supabase.seedDefaultColumns(board.id);
+        this.columns.set(seeded);
       } else {
         this.columns.set(cols);
       }
+
+      // 3. Load extra side-panel data logs and members
+      this.loadActivityLogs();
+      if (this.isOwner()) {
+        this.loadBoardMembers();
+      }
+
     } catch (err: any) {
       this.error.set(err?.message ?? 'Failed to load board');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  // ── Activity and Collaboration ────────────────────────────────────────────
+  switchBoard(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const boardId = target.value;
+    if (!boardId || boardId === this.activeBoard()?.id) return;
+    this.loadBoard(boardId);
+  }
+
+  async loadActivityLogs() {
+    const b = this.activeBoard();
+    if (!b) return;
+    try {
+      this.activityLogs.set(await this.supabase.getActivityLogs(b.id));
+    } catch (err) { console.error('loadActivityLogs', err); }
+  }
+
+  async loadBoardMembers() {
+    const b = this.activeBoard();
+    if (!b) return;
+    try {
+      this.boardMembers.set(await this.supabase.getBoardMembers(b.id));
+    } catch (err) { console.error('loadBoardMembers', err); }
+  }
+
+  toggleActivityPanel() {
+    this.showActivityPanel.set(!this.showActivityPanel());
+    if (this.showActivityPanel()) {
+      this.loadActivityLogs();
+    }
+  }
+
+  openInviteModal() {
+    this.inviteEmail.set('');
+    this.inviteError.set(null);
+    this.showInviteModal.set(true);
+    this.loadBoardMembers(); // refresh list
+  }
+
+  closeInviteModal() {
+    this.showInviteModal.set(false);
+  }
+
+  async submitInvite() {
+    const email = this.inviteEmail().trim();
+    if (!email) return;
+    const b = this.activeBoard();
+    if (!b) return;
+
+    this.inviteLoading.set(true);
+    this.inviteError.set(null);
+    try {
+      await this.supabase.inviteMember(b.id, email);
+      this.inviteEmail.set('');
+      await this.loadBoardMembers();
+    } catch (err: any) {
+      this.inviteError.set(err?.message ?? 'Failed to invite user');
+    } finally {
+      this.inviteLoading.set(false);
+    }
+  }
+
+  async removeMember(userId: string) {
+    const b = this.activeBoard();
+    if (!b) return;
+    try {
+      await this.supabase.removeMember(b.id, userId);
+      await this.loadBoardMembers();
+    } catch (err) {
+      console.error('removeMember', err);
+    }
+  }
+
+  private async logAction(cardId: string | null, action: string, details: string) {
+    const b = this.activeBoard();
+    const u = this.authService.user();
+    if (b && u) {
+      await this.supabase.logActivity(b.id, cardId, action, details, u.email ?? 'Unknown');
+      // If panel is open, refresh it now
+      if (this.showActivityPanel()) {
+        this.loadActivityLogs();
+      }
     }
   }
 
@@ -242,14 +357,19 @@ export class App implements OnInit {
     );
     this.closeAddModal();
 
-    this.supabase.addCard(columnId, newCardObj, position).catch((err) => {
-      console.error('addCard', err);
-      this.columns.update((cols) =>
-        cols.map((col) =>
-          col.id === columnId ? { ...col, cards: col.cards.filter((c) => c.id !== newCardObj.id) } : col
-        )
-      );
-    });
+    this.supabase.addCard(columnId, newCardObj, position)
+      .then(() => {
+        const colTitle = this.columns().find((c) => c.id === columnId)?.title ?? '';
+        this.logAction(newCardObj.id, 'created', `Created card "${newCardObj.title}" in ${colTitle}`);
+      })
+      .catch((err) => {
+        console.error('addCard', err);
+        this.columns.update((cols) =>
+          cols.map((col) =>
+            col.id === columnId ? { ...col, cards: col.cards.filter((c) => c.id !== newCardObj.id) } : col
+          )
+        );
+      });
   }
 
   // ── Edit card modal ───────────────────────────────────────────────────────
@@ -313,6 +433,7 @@ export class App implements OnInit {
     try {
       await this.supabase.updateCard(updatedCard);
       await this.supabase.syncSubtasks(updatedCard.id, updatedCard.subtasks);
+      this.logAction(updatedCard.id, 'edited', `Edited card "${updatedCard.title}"`);
     } catch (err) {
       console.error('submitEditCard', err);
       this.columns.update((cols) =>
@@ -336,19 +457,23 @@ export class App implements OnInit {
         return { ...col, cards: col.cards.filter((c) => c.id !== cardId) };
       })
     );
-    this.supabase.deleteCard(cardId).catch((err) => {
-      console.error('deleteCard', err);
-      if (removedCard) {
-        this.columns.update((cols) =>
-          cols.map((col) => {
-            if (col.id !== columnId) return col;
-            const cards = [...col.cards];
-            cards.splice(removedIndex, 0, removedCard!);
-            return { ...col, cards };
-          })
-        );
-      }
-    });
+    this.supabase.deleteCard(cardId)
+      .then(() => {
+        this.logAction(cardId, 'deleted', `Deleted card "${removedCard?.title}"`);
+      })
+      .catch((err) => {
+        console.error('deleteCard', err);
+        if (removedCard) {
+          this.columns.update((cols) =>
+            cols.map((col) => {
+              if (col.id !== columnId) return col;
+              const cards = [...col.cards];
+              cards.splice(removedIndex, 0, removedCard!);
+              return { ...col, cards };
+            })
+          );
+        }
+      });
   }
 
   // ── Drag and drop ─────────────────────────────────────────────────────────
@@ -399,7 +524,15 @@ export class App implements OnInit {
     this.dragOverColumnId.set(null);
     this.dragOverCardId.set(null);
 
-    this.supabase.moveCard(card.id, toColumnId, newPosition).catch((err) => console.error('moveCard', err));
+    this.supabase.moveCard(card.id, toColumnId, newPosition)
+      .then(() => {
+        if (fromColumnId !== toColumnId) {
+          const fromTitle = this.columns().find((c) => c.id === fromColumnId)?.title;
+          const toTitle = this.columns().find((c) => c.id === toColumnId)?.title;
+          this.logAction(card.id, 'moved', `Moved card "${card.title}" from ${fromTitle} to ${toTitle}`);
+        }
+      })
+      .catch((err) => console.error('moveCard', err));
   }
 
   // ── Misc helpers ──────────────────────────────────────────────────────────

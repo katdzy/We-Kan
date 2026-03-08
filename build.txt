@@ -1,0 +1,44 @@
+﻿[33mΓ¥»[39m Building...
+[32mΓ£ö[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mmain-3IIBHLCL.js[39m   [2m | [22m[2mmain[22m         [2m | [22m[36m475.83 kB[39m[2m | [22m              [36m114.95 kB[39m
+[32mstyles-ZS2B4NXI.css[39m[2m | [22m[2mstyles[22m       [2m | [22m  [36m9.01 kB[39m[2m | [22m              [36m822 bytes[39m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m[2m | [22m[1m484.84 kB[22m[2m | [22m              [1m115.77 kB[22m
+
+Application bundle generation failed. [4.004 seconds] - 2026-03-08T08:35:11.714Z
+
+node.exe : 
+[1m[33m[33mΓû▓ [43;33m[
+[43;30mWARNING[43;33m][0m 
+[1msrc/app/app.css 
+exceeded maximum budget. 
+Budget 4.00 kB was not met 
+by 16.67 kB with a total of 
+20.67 kB.[0m
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE $NPX_CLI_JS 
+$args
++   ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo          
+: N    otSpecified: 
+([1m[33m[33    mΓ...f 
+20.67 kB.[0m:String    ) 
+[], RemoteException
+    + FullyQualifiedErrorId 
+: N    ativeCommandError
+ 
+
+[39m[22m
+[1m[31m[31mX [41;31m[[4
+1;97mERROR[41;31m][0m 
+[1msrc/app/app.css 
+exceeded maximum budget. 
+Budget 8.00 kB was not met 
+by 12.67 kB with a total of 
+20.67 kB.[0m
+
+[39m[22m

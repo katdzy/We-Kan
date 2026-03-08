@@ -3,13 +3,30 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 import { Column, Card, Subtask } from './app';
 
+export interface ActivityLog {
+  id: string;
+  board_id: string;
+  card_id: string | null;
+  user_id: string;
+  user_email: string;
+  action: string;
+  details: string;
+  created_at: string;
+}
+
+export interface BoardMember {
+  user_id: string;
+  user_email: string;
+  role: 'owner' | 'member';
+}
+
 // ── DB row shapes ─────────────────────────────────────────────────────────────
 interface ColumnRow {
   id: string;
+  board_id: string;
   title: string;
   color: string;
   position: number;
-  user_id: string;
 }
 
 interface CardRow {
@@ -48,10 +65,11 @@ export class SupabaseService {
   }
 
   // ── Load entire board ───────────────────────────────────────────────────────
-  async loadBoard(): Promise<Column[]> {
+  async loadBoard(boardId: string): Promise<Column[]> {
     const { data: colRows, error: colErr } = await this.supabase
       .from('columns')
       .select('*')
+      .eq('board_id', boardId)
       .order('position');
     if (colErr) throw colErr;
 
@@ -96,17 +114,17 @@ export class SupabaseService {
     }));
   }
 
-  // ── Seed default columns for a new user ────────────────────────────────────
-  async seedDefaultColumns(userId: string): Promise<Column[]> {
+  // ── Seed default columns for a new board ────────────────────────────────────
+  async seedDefaultColumns(boardId: string): Promise<Column[]> {
     const rows = DEFAULT_COLUMNS.map((col, i) => ({
-      id: `${userId.slice(0, 8)}-col-${i}`,
+      id: `${boardId}-col-${i}`,
       title: col.title,
       color: col.color,
       position: i,
-      user_id: userId,
+      board_id: boardId,
     }));
 
-    const { error } = await this.supabase.from('columns').insert(rows);
+    const { error } = await this.supabase.from('columns').upsert(rows, { onConflict: 'id', ignoreDuplicates: true });
     if (error) throw error;
 
     return rows.map((r) => ({ id: r.id, title: r.title, color: r.color, cards: [] }));
@@ -192,6 +210,128 @@ export class SupabaseService {
       .from('subtasks')
       .update({ done })
       .eq('id', subtaskId);
+    if (error) throw error;
+  }
+
+  // ── Boards ──────────────────────────────────────────────────────────────────
+  /** Gets all boards the user has access to, creating a default one if none exist. */
+  async getAccessibleBoards(userId: string, email: string) {
+    const { data: boards, error: fetchErr } = await this.supabase
+      .from('boards')
+      .select('id, title, owner_id')
+      .order('created_at', { ascending: true });
+    
+    if (fetchErr) throw fetchErr;
+
+    if (boards && boards.length > 0) {
+      return boards;
+    }
+
+    const boardId = `${userId.slice(0, 8)}-board`;
+    const { error } = await this.supabase.from('boards').upsert(
+      { id: boardId, title: `${email}'s Board`, owner_id: userId },
+      { onConflict: 'id', ignoreDuplicates: true }
+    );
+    if (error) throw error;
+
+    // Ensure owner is in board_members
+    const { error: memberErr } = await this.supabase.from('board_members').upsert(
+      { board_id: boardId, user_id: userId, role: 'owner' },
+      { onConflict: 'board_id,user_id', ignoreDuplicates: true }
+    );
+    if (memberErr) throw memberErr;
+
+    return [{ id: boardId, title: `${email}'s Board`, owner_id: userId }];
+  }
+
+  // ── Activity Logs ───────────────────────────────────────────────────────────
+  async logActivity(
+    boardId: string,
+    cardId: string | null,
+    action: string,
+    details: string,
+    userEmail: string
+  ): Promise<void> {
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) return;
+    // Embed user email in details for display (no join needed on select)
+    const { error } = await this.supabase.from('activity_logs').insert({
+      board_id: boardId,
+      card_id: cardId ?? undefined,
+      user_id: user.id,
+      action,
+      details: `[${userEmail}] ${details}`,
+    });
+    // Swallow log errors silently so they never break the main flow
+    if (error) console.warn('logActivity error', error);
+  }
+
+  async getActivityLogs(boardId: string): Promise<ActivityLog[]> {
+    const { data, error } = await this.supabase
+      .from('activity_logs')
+      .select('*')
+      .eq('board_id', boardId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    // Parse user_email out of the details string prefix `[email] ...`
+    return (data ?? []).map((row: any) => {
+      const match = row.details.match(/^\[(.+?)\] (.*)$/);
+      return {
+        id: row.id,
+        board_id: row.board_id,
+        card_id: row.card_id ?? null,
+        user_id: row.user_id,
+        user_email: match ? match[1] : 'Unknown',
+        action: row.action,
+        details: match ? match[2] : row.details,
+        created_at: row.created_at,
+      } as ActivityLog;
+    });
+  }
+
+  // ── Board Members ───────────────────────────────────────────────────────────
+  async getBoardMembers(boardId: string): Promise<BoardMember[]> {
+    const { data, error } = await this.supabase
+      .from('board_members')
+      .select('user_id, role')
+      .eq('board_id', boardId);
+    if (error) throw error;
+
+    // Fetch emails via RPC for each member
+    const members: BoardMember[] = [];
+    for (const row of (data ?? []) as { user_id: string; role: string }[]) {
+      const { data: emailData } = await this.supabase
+        .rpc('get_user_email_by_id', { user_id_input: row.user_id });
+      members.push({
+        user_id: row.user_id,
+        user_email: emailData ?? row.user_id,
+        role: row.role as 'owner' | 'member',
+      });
+    }
+    return members;
+  }
+
+  async inviteMember(boardId: string, email: string): Promise<void> {
+    // Look up the user's UUID by email via a security-definer RPC
+    const { data: targetUserId, error: lookupErr } = await this.supabase
+      .rpc('get_user_id_by_email', { email_input: email });
+    if (lookupErr) throw lookupErr;
+    if (!targetUserId) throw new Error(`No user found with email: ${email}`);
+
+    const { error } = await this.supabase.from('board_members').upsert(
+      { board_id: boardId, user_id: targetUserId, role: 'member' },
+      { onConflict: 'board_id,user_id', ignoreDuplicates: true }
+    );
+    if (error) throw error;
+  }
+
+  async removeMember(boardId: string, userId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('board_members')
+      .delete()
+      .eq('board_id', boardId)
+      .eq('user_id', userId);
     if (error) throw error;
   }
 }
