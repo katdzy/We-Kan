@@ -257,12 +257,17 @@ export class SupabaseService {
     const { data: { user: authUser } } = await this.supabase.auth.getUser();
     const display_name = authUser?.user_metadata?.['display_name'] || email;
 
-    const { data: boards, error: fetchErr } = await this.supabase
+    const { data: boardsData, error: fetchErr } = await this.supabase
       .from('boards')
-      .select('id, title, owner_id')
+      .select('id, title, owner_id, color, board_members(count)')
       .order('created_at', { ascending: true });
 
     if (fetchErr) throw fetchErr;
+
+    const boards = (boardsData || []).map((b: any) => ({
+      ...b,
+      member_count: b.board_members?.[0]?.count || 0
+    }));
 
     if (boards && boards.length > 0) {
       // Keep the user's own board title in sync with their display_name
@@ -295,6 +300,34 @@ export class SupabaseService {
     if (memberErr) throw memberErr;
 
     return [{ id: boardId, title: `${display_name}'s Board`, owner_id: userId }];
+  }
+
+  /** Creates a new board with default columns for the given user. */
+  async createBoard(userId: string, title: string, description?: string, color?: string): Promise<{ id: string; title: string; owner_id: string; color: string; member_count: number }> {
+    const boardId = `${userId.slice(0, 8)}-${Date.now()}`;
+    const boardColor = color || '#BDF522';
+
+    const { error } = await this.supabase.from('boards').insert({
+      id: boardId,
+      title: title.trim(),
+      description: description?.trim() || null,
+      color: boardColor,
+      owner_id: userId,
+    });
+    if (error) throw error;
+
+    // Add owner to board_members
+    const { error: memberErr } = await this.supabase.from('board_members').insert({
+      board_id: boardId,
+      user_id: userId,
+      role: 'owner',
+    });
+    if (memberErr) throw memberErr;
+
+    // Seed default columns
+    await this.seedDefaultColumns(boardId);
+
+    return { id: boardId, title: title.trim(), owner_id: userId, color: boardColor, member_count: 1 };
   }
 
   // ── Activity Logs ───────────────────────────────────────────────────────────

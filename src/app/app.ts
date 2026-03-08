@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterOutlet, Router, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterOutlet, Router, RouterLinkActive, ActivatedRoute } from '@angular/router';
 import { SupabaseService, ActivityLog, BoardMember } from './supabase.service';
 import { AuthService } from './auth.service';
 
@@ -37,13 +37,16 @@ export class App implements OnInit {
   private supabase = inject(SupabaseService);
   authService = inject(AuthService);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // ── Board state ───────────────────────────────────────────────────────────
-  activeBoard = signal<{ id: string; title: string; owner_id: string } | null>(null);
-  accessibleBoards = signal<{ id: string; title: string; owner_id: string }[]>([]);
+  activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number } | null>(null);
+  accessibleBoards = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number }[]>([]);
   columns = signal<Column[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
+  /** Controls whether /boards shows the grid list or the kanban view */
+  viewMode = signal<'list' | 'board'>('list');
 
   isOwner = computed(() => {
     const user = this.authService.user();
@@ -59,6 +62,15 @@ export class App implements OnInit {
   inviteEmail = signal('');
   inviteError = signal<string | null>(null);
   inviteLoading = signal(false);
+  
+  // ── Create board modal ───────────────────────────────────────────────────────────
+  showCreateBoardModal = signal(false);
+  newBoardTitle = signal('');
+  newBoardDescription = signal('');
+  selectedBoardColor = signal('#BDF522');
+  boardColorOptions = ['#BDF522', '#1E47F7', '#FA51A2', '#FE8616', '#9A65ED'];
+  createBoardLoading = signal(false);
+  createBoardError = signal<string | null>(null);
 
   // ── Auth UI state ─────────────────────────────────────────────────────────
   authMode = signal<'login' | 'signup'>('login');
@@ -91,13 +103,23 @@ export class App implements OnInit {
   totalCards = computed(() => this.columns().reduce((sum, col) => sum + col.cards.length, 0));
 
   constructor() {
-    // When session changes (login / logout), load or clear board
+    // When session changes (login / logout), fetch boards list; clear on logout
     effect(() => {
       const session = this.authService.session();
       if (session) {
-        this.loadBoard();
+        const boardId = this.route.snapshot.queryParams['boardId'] ?? undefined;
+        if (boardId) {
+          // Deep-linked to a specific board — go straight to kanban view
+          this.viewMode.set('board');
+          this.loadBoard(boardId);
+        } else {
+          // Load boards list for the selector, but stay in list view
+          this.loadAccessibleBoards();
+        }
       } else {
+        this.viewMode.set('list');
         this.activeBoard.set(null);
+        this.accessibleBoards.set([]);
         this.columns.set([]);
         this.activityLogs.set([]);
         this.boardMembers.set([]);
@@ -107,7 +129,13 @@ export class App implements OnInit {
   }
 
   async ngOnInit() {
-    // Initial load is handled by the effect above once session resolves
+    this.route.queryParams.subscribe(params => {
+      const boardId = params['boardId'];
+      if (boardId && this.authService.session()) {
+        this.viewMode.set('board');
+        this.loadBoard(boardId);
+      }
+    });
   }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -153,6 +181,23 @@ export class App implements OnInit {
   }
 
   // ── Board load ────────────────────────────────────────────────────────────
+  /** Fetches all accessible boards and stores them — does NOT load a kanban. */
+  async loadAccessibleBoards() {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const user = this.authService.user();
+      if (!user) throw new Error('Not logged in');
+      const boards = await this.supabase.getAccessibleBoards(user.id, user.email ?? 'Unknown');
+      this.accessibleBoards.set(boards);
+    } catch (err: any) {
+      this.error.set(err?.message ?? 'Failed to load boards');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /** Opens a specific board in kanban view. */
   async loadBoard(targetBoardId?: string) {
     this.loading.set(true);
     this.error.set(null);
@@ -160,18 +205,17 @@ export class App implements OnInit {
       const user = this.authService.user();
       if (!user) throw new Error('Not logged in');
 
-      // 1. Resolve accessible boards
+      // 1. Resolve accessible boards (also syncs board title)
       const boards = await this.supabase.getAccessibleBoards(user.id, user.email ?? 'Unknown');
       this.accessibleBoards.set(boards);
-      
+
       let board = targetBoardId ? boards.find((b: any) => b.id === targetBoardId) : boards[0];
       if (!board) board = boards[0];
-      
+
       this.activeBoard.set(board);
 
       // 2. Load columns, cards, subtasks
       const cols = await this.supabase.loadBoard(board.id);
-      // If brand new user with no columns, seed them
       if (cols.length === 0 && board.owner_id === user.id) {
         const seeded = await this.supabase.seedDefaultColumns(board.id);
         this.columns.set(seeded);
@@ -179,7 +223,7 @@ export class App implements OnInit {
         this.columns.set(cols);
       }
 
-      // 3. Load extra side-panel data logs and members
+      // 3. Load side-panel data
       this.loadActivityLogs();
       if (this.isOwner()) {
         this.loadBoardMembers();
@@ -190,6 +234,60 @@ export class App implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /** Called when the user clicks a board card in list view. */
+  selectBoard(boardId: string) {
+    this.viewMode.set('board');
+    this.loadBoard(boardId);
+  }
+
+  /** Returns to the boards list view. */
+  goBackToList() {
+    this.viewMode.set('list');
+    this.activeBoard.set(null);
+    this.columns.set([]);
+    this.router.navigate(['/boards'], { replaceUrl: true });
+  }
+
+   openCreateBoardModal() {
+    this.newBoardTitle.set('');
+    this.newBoardDescription.set('');
+    this.selectedBoardColor.set('#BDF522');
+    this.createBoardError.set(null);
+    this.showCreateBoardModal.set(true);
+  }
+
+  closeCreateBoardModal() {
+    this.showCreateBoardModal.set(false);
+  }
+
+  async submitCreateBoard() {
+    const title = this.newBoardTitle().trim();
+    if (!title) return;
+    const user = this.authService.user();
+    if (!user) return;
+
+    this.createBoardLoading.set(true);
+    this.createBoardError.set(null);
+    try {
+      const title = this.newBoardTitle().trim();
+      const description = this.newBoardDescription().trim();
+      const color = this.selectedBoardColor();
+      const newBoard = await this.supabase.createBoard(user.id, title, description, color);
+      this.accessibleBoards.update(boards => [...boards, newBoard]);
+      this.closeCreateBoardModal();
+      // Immediately open the new board
+      this.selectBoard(newBoard.id);
+    } catch (err: any) {
+      this.createBoardError.set(err?.message ?? 'Failed to create board');
+    } finally {
+      this.createBoardLoading.set(false);
+    }
+  }
+
+  isOwnerOfBoard(board: { owner_id: string }) {
+    return this.authService.user()?.id === board.owner_id;
   }
 
   // ── Activity and Collaboration ────────────────────────────────────────────
