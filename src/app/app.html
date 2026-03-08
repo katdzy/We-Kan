@@ -151,6 +151,12 @@
       </div>
     </div>
 
+    <nav class="app-navbar">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Dashboard</a>
+      <a routerLink="/boards" routerLinkActive="active" class="nav-link">Boards</a>
+      <a routerLink="/profile" routerLinkActive="active" class="nav-link">Profile</a>
+    </nav>
+
     <!-- User info + actions -->
     <div class="header-right">
       <div class="header-actions">
@@ -198,7 +204,7 @@
 
   <!-- Board -->
   <main class="board-container">
-    @if (router.url !== '/profile') {
+    @if (router.url.startsWith('/boards')) {
       <div class="board">
       @for (column of columns(); track trackColumn($index, column)) {
         <div

@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterOutlet, Router } from '@angular/router';
+import { RouterLink, RouterOutlet, Router, RouterLinkActive } from '@angular/router';
 import { SupabaseService, ActivityLog, BoardMember } from './supabase.service';
 import { AuthService } from './auth.service';
 
@@ -29,7 +29,7 @@ export interface Column {
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, RouterLink, RouterOutlet],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
