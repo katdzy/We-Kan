@@ -251,18 +251,14 @@ export class SupabaseService {
   }
 
   // ── Boards ──────────────────────────────────────────────────────────────────
-  async getRecentBoardsWithProgress(userId: string) {
+  async getAccessibleBoardsWithProgress(userId: string) {
     const { data: { user } } = await this.supabase.auth.getUser();
     const email = user?.email || '';
     
     // Get accessible boards
     const allBoards = await this.getAccessibleBoards(userId, email);
     
-    // Take up to 3 most recent boards. Since getAccessibleBoards orders by created_at ascending,
-    // we reverse the array to get the latest 3 boards first.
-    const recentBoards = allBoards.slice().reverse().slice(0, 3);
-    
-    const boardsWithProgress = await Promise.all(recentBoards.map(async (board) => {
+    const boardsWithProgress = await Promise.all(allBoards.map(async (board) => {
       // Fetch board full state to calculate progress
       const columns = await this.loadBoard(board.id);
       
@@ -301,6 +297,13 @@ export class SupabaseService {
     }));
     
     return boardsWithProgress;
+  }
+
+  async getRecentBoardsWithProgress(userId: string) {
+    const boardsWithProgress = await this.getAccessibleBoardsWithProgress(userId);
+    // Take up to 3 most recent boards. Since getAccessibleBoards orders by created_at ascending,
+    // we reverse the array to get the latest 3 boards first.
+    return boardsWithProgress.slice().reverse().slice(0, 3);
   }
 
   /** Gets all boards the user has access to, creating a default one if none exist. */

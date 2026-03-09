@@ -40,8 +40,8 @@ export class App implements OnInit {
   private route = inject(ActivatedRoute);
 
   // ── Board state ───────────────────────────────────────────────────────────
-  activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number } | null>(null);
-  accessibleBoards = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number }[]>([]);
+  activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number; progress?: number } | null>(null);
+  accessibleBoards = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number; progress?: number }[]>([]);
   columns = signal<Column[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
@@ -188,7 +188,7 @@ export class App implements OnInit {
     try {
       const user = this.authService.user();
       if (!user) throw new Error('Not logged in');
-      const boards = await this.supabase.getAccessibleBoards(user.id, user.email ?? 'Unknown');
+      const boards = await this.supabase.getAccessibleBoardsWithProgress(user.id);
       this.accessibleBoards.set(boards);
     } catch (err: any) {
       this.error.set(err?.message ?? 'Failed to load boards');
@@ -206,7 +206,7 @@ export class App implements OnInit {
       if (!user) throw new Error('Not logged in');
 
       // 1. Resolve accessible boards (also syncs board title)
-      const boards = await this.supabase.getAccessibleBoards(user.id, user.email ?? 'Unknown');
+      const boards = await this.supabase.getAccessibleBoardsWithProgress(user.id);
       this.accessibleBoards.set(boards);
 
       let board = targetBoardId ? boards.find((b: any) => b.id === targetBoardId) : boards[0];

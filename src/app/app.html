@@ -146,7 +146,14 @@
               </svg>
               Boards
             </button>
-            <h1 class="app-title">{{ activeBoard()?.title ?? 'Board' }}</h1>
+            <h1 class="app-title" style="margin-right: 12px;">{{ activeBoard()?.title ?? 'Board' }}</h1>
+            <button class="header-icon-btn" (click)="toggleActivityPanel()" title="Activity">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="icon-label">Activity Log</span>
+            </button>
           </div>
           <p class="app-subtitle">{{ totalCards() }} tasks across {{ columns().length }} columns</p>
         } @else {
@@ -177,14 +184,6 @@
             <span class="icon-label">Members</span>
           </button>
         }
-        <!-- Activity Button -->
-        <button class="header-icon-btn" (click)="toggleActivityPanel()" title="Activity">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          <span class="icon-label">Activity</span>
-        </button>
       </div>
 
       <div class="header-divider"></div>
@@ -248,6 +247,17 @@
                       </span>
                     </div>
                     <span class="blc-role">{{ isOwnerOfBoard(board) ? 'Owner' : 'Member' }}</span>
+                    @if (board.progress !== undefined) {
+                      <div class="blc-progress" style="margin-top: 8px;">
+                        <div class="progress-header" style="display:flex;justify-content:space-between;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;">
+                          <span>Progress</span>
+                          <span>{{ board.progress }}%</span>
+                        </div>
+                        <div class="progress-track" style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+                          <div class="progress-fill" [style.width.%]="board.progress" style="height:100%;background:#10b981;border-radius:2px;transition:width 0.3s ease;"></div>
+                        </div>
+                      </div>
+                    }
                   </div>
                   <div class="blc-arrow">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
