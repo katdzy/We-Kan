@@ -72,6 +72,24 @@ export class App implements OnInit {
   createBoardLoading = signal(false);
   createBoardError = signal<string | null>(null);
 
+  // ── Edit board modal ─────────────────────────────────────────────────────────────
+  showEditBoardModal = signal(false);
+  editingBoardId = signal<string | null>(null);
+  editBoardTitle = signal('');
+  editBoardDescription = signal('');
+  editBoardColor = signal('#BDF522');
+  editBoardLoading = signal(false);
+  editBoardError = signal<string | null>(null);
+
+  // ── Delete board modal ───────────────────────────────────────────────────────────
+  showDeleteBoardModal = signal(false);
+  deletingBoardId = signal<string | null>(null);
+  deleteBoardLoading = signal(false);
+  deleteBoardError = signal<string | null>(null);
+
+  // ── Board context menu ───────────────────────────────────────────────────────────
+  openBoardMenuId = signal<string | null>(null);
+
   // ── Auth UI state ─────────────────────────────────────────────────────────
   authMode = signal<'login' | 'signup'>('login');
   authEmail = signal('');
@@ -288,6 +306,105 @@ export class App implements OnInit {
 
   isOwnerOfBoard(board: { owner_id: string }) {
     return this.authService.user()?.id === board.owner_id;
+  }
+
+  // ── Board Edit Menu ───────────────────────────────────────────────────────
+  toggleBoardMenu(event: Event, boardId: string) {
+    event.stopPropagation();
+    if (this.openBoardMenuId() === boardId) {
+      this.openBoardMenuId.set(null);
+    } else {
+      this.openBoardMenuId.set(boardId);
+    }
+  }
+
+  closeBoardMenu() {
+    this.openBoardMenuId.set(null);
+  }
+
+  openEditBoardModal(event: Event | null, board: any) {
+    if (event) event.stopPropagation();
+    this.closeBoardMenu();
+    this.editingBoardId.set(board.id);
+    this.editBoardTitle.set(board.title);
+    this.editBoardDescription.set(board.description || '');
+    this.editBoardColor.set(board.color || '#BDF522');
+    this.editBoardError.set(null);
+    this.showEditBoardModal.set(true);
+  }
+
+  closeEditBoardModal() {
+    this.showEditBoardModal.set(false);
+    this.editingBoardId.set(null);
+  }
+
+  async submitEditBoard() {
+    const title = this.editBoardTitle().trim();
+    const boardId = this.editingBoardId();
+    if (!title || !boardId) return;
+
+    this.editBoardLoading.set(true);
+    this.editBoardError.set(null);
+    try {
+      const description = this.editBoardDescription().trim();
+      const color = this.editBoardColor();
+      await this.supabase.updateBoard(boardId, title, description, color);
+      
+      // Update local lists
+      this.accessibleBoards.update(boards => 
+        boards.map(b => b.id === boardId ? { ...b, title, description, color } : b)
+      );
+      
+      // If editing the active board, update that too
+      const active = this.activeBoard();
+      if (active && active.id === boardId) {
+        this.activeBoard.set({ ...active, title, color });
+      }
+
+      this.closeEditBoardModal();
+    } catch (err: any) {
+      this.editBoardError.set(err?.message ?? 'Failed to update board');
+    } finally {
+      this.editBoardLoading.set(false);
+    }
+  }
+
+  openDeleteBoardModal(event: Event | null, boardId: string) {
+    if (event) event.stopPropagation();
+    this.closeBoardMenu();
+    this.deletingBoardId.set(boardId);
+    this.deleteBoardError.set(null);
+    this.showDeleteBoardModal.set(true);
+  }
+
+  closeDeleteBoardModal() {
+    this.showDeleteBoardModal.set(false);
+    this.deletingBoardId.set(null);
+  }
+
+  async submitDeleteBoard() {
+    const boardId = this.deletingBoardId();
+    if (!boardId) return;
+
+    this.deleteBoardLoading.set(true);
+    this.deleteBoardError.set(null);
+    try {
+      await this.supabase.deleteBoard(boardId);
+      
+      // Remove from list
+      this.accessibleBoards.update(boards => boards.filter(b => b.id !== boardId));
+      
+      this.closeDeleteBoardModal();
+      
+      // If we just deleted the active board, we must go back to list
+      if (this.activeBoard()?.id === boardId) {
+        this.goBackToList();
+      }
+    } catch (err: any) {
+      this.deleteBoardError.set(err?.message ?? 'Failed to delete board');
+    } finally {
+      this.deleteBoardLoading.set(false);
+    }
   }
 
   // ── Activity and Collaboration ────────────────────────────────────────────

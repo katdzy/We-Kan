@@ -385,6 +385,26 @@ export class SupabaseService {
     return { id: boardId, title: title.trim(), owner_id: userId, color: boardColor, member_count: 1 };
   }
 
+  async updateBoard(boardId: string, title: string, description?: string, color?: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('boards')
+      .update({
+        title: title.trim(),
+        description: description?.trim() || null,
+        color
+      })
+      .eq('id', boardId);
+    if (error) throw error;
+  }
+
+  async deleteBoard(boardId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('boards')
+      .delete()
+      .eq('id', boardId);
+    if (error) throw error;
+  }
+
   // ── Activity Logs ───────────────────────────────────────────────────────────
   async logActivity(
     boardId: string,
