@@ -251,6 +251,58 @@ export class SupabaseService {
   }
 
   // ── Boards ──────────────────────────────────────────────────────────────────
+  async getRecentBoardsWithProgress(userId: string) {
+    const { data: { user } } = await this.supabase.auth.getUser();
+    const email = user?.email || '';
+    
+    // Get accessible boards
+    const allBoards = await this.getAccessibleBoards(userId, email);
+    
+    // Take up to 3 most recent boards. Since getAccessibleBoards orders by created_at ascending,
+    // we reverse the array to get the latest 3 boards first.
+    const recentBoards = allBoards.slice().reverse().slice(0, 3);
+    
+    const boardsWithProgress = await Promise.all(recentBoards.map(async (board) => {
+      // Fetch board full state to calculate progress
+      const columns = await this.loadBoard(board.id);
+      
+      let totalCards = 0;
+      let completedCards = 0;
+      
+      const doneColumnTitle = 'Done';
+      
+      for (const col of columns) {
+        const isDoneColumn = col.title.toLowerCase() === doneColumnTitle.toLowerCase();
+        
+        for (const card of col.cards) {
+          totalCards++;
+          
+          if (card.subtasks && card.subtasks.length > 0) {
+            // Task has subtasks: Complete only if in 'Done' AND all subtasks are checked
+            const allSubtasksDone = card.subtasks.every(st => st.done);
+            if (isDoneColumn && allSubtasksDone) {
+              completedCards++;
+            }
+          } else {
+            // Task has no subtasks: Complete if in 'Done' column
+            if (isDoneColumn) {
+              completedCards++;
+            }
+          }
+        }
+      }
+      
+      const progress = totalCards === 0 ? 0 : Math.round((completedCards / totalCards) * 100);
+      
+      return {
+        ...board,
+        progress
+      };
+    }));
+    
+    return boardsWithProgress;
+  }
+
   /** Gets all boards the user has access to, creating a default one if none exist. */
   async getAccessibleBoards(userId: string, email: string) {
     // Fetch display_name from auth user metadata, fall back to email

@@ -4,8 +4,8 @@ import { Dashboard } from './dashboard/dashboard';
 import { App } from './app';
 
 export const routes: Routes = [
-    {path: '', component: Dashboard, pathMatch: 'full'},
-    {path: 'boards', component: App},
-    {path: 'profile', component: Profile},
-    {path: '**', redirectTo: ''}
+    { path: '', component: Dashboard, pathMatch: 'full' },
+    { path: 'boards', component: App },
+    { path: 'profile', component: Profile },
+    { path: '**', redirectTo: '' }
 ];
