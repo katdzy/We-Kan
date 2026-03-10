@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 import { Column, Card, Subtask } from './app';
 
@@ -494,5 +494,44 @@ export class SupabaseService {
       .eq('board_id', boardId)
       .eq('user_id', userId);
     if (error) throw error;
+  }
+
+  // ── Real-time subscriptions ─────────────────────────────────────────────────
+  /**
+   * Subscribes to real-time changes on the board's tables.
+   * Calls `callback` whenever a card, column, subtask, or activity log changes.
+   * Returns the channel so the caller can unsubscribe later.
+   */
+  subscribeToBoardChanges(boardId: string, callback: () => void): RealtimeChannel {
+    const channel = this.supabase
+      .channel(`board-${boardId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'cards' },
+        callback
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'columns', filter: `board_id=eq.${boardId}` },
+        callback
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'subtasks' },
+        callback
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'activity_logs', filter: `board_id=eq.${boardId}` },
+        callback
+      )
+      .subscribe();
+
+    return channel;
+  }
+
+  /** Removes a Realtime channel subscription. */
+  unsubscribeFromBoard(channel: RealtimeChannel): void {
+    this.supabase.removeChannel(channel);
   }
 }

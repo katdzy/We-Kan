@@ -1,4 +1,5 @@
-import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, OnDestroy, effect } from '@angular/core';
+import { RealtimeChannel } from '@supabase/supabase-js';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router, RouterLinkActive, ActivatedRoute } from '@angular/router';
@@ -33,11 +34,12 @@ export interface Column {
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
   private supabase = inject(SupabaseService);
   authService = inject(AuthService);
   router = inject(Router);
   private route = inject(ActivatedRoute);
+  private realtimeChannel: RealtimeChannel | null = null;
 
   // ── Board state ───────────────────────────────────────────────────────────
   activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number; progress?: number } | null>(null);
@@ -194,8 +196,13 @@ export class App implements OnInit {
   }
 
   async signOut() {
+    this.teardownRealtimeSubscription();
     await this.authService.signOut();
     // effect() will clear columns automatically
+  }
+
+  ngOnDestroy() {
+    this.teardownRealtimeSubscription();
   }
 
   // ── Board load ────────────────────────────────────────────────────────────
@@ -215,9 +222,12 @@ export class App implements OnInit {
     }
   }
 
-  /** Opens a specific board in kanban view. */
-  async loadBoard(targetBoardId?: string) {
-    this.loading.set(true);
+  /** Opens a specific board in kanban view.
+   * @param targetBoardId The board to open. If omitted, defaults to the first accessible board.
+   * @param silent When true, skips the full-screen loading spinner (used for background real-time refreshes).
+   */
+  async loadBoard(targetBoardId?: string, silent = false) {
+    if (!silent) this.loading.set(true);
     this.error.set(null);
     try {
       const user = this.authService.user();
@@ -247,10 +257,34 @@ export class App implements OnInit {
         this.loadBoardMembers();
       }
 
+      // 4. Establish real-time subscription if this is a new board load (non-silent)
+      if (!silent) {
+        this.setupRealtimeSubscription(board.id);
+      }
+
     } catch (err: any) {
       this.error.set(err?.message ?? 'Failed to load board');
     } finally {
-      this.loading.set(false);
+      if (!silent) this.loading.set(false);
+    }
+  }
+
+  /** Sets up a Supabase real-time WebSocket subscription for the active board. */
+  private setupRealtimeSubscription(boardId: string) {
+    // Tear down any existing subscription first
+    this.teardownRealtimeSubscription();
+
+    this.realtimeChannel = this.supabase.subscribeToBoardChanges(boardId, () => {
+      // Silently reload the board data in the background
+      this.loadBoard(boardId, true);
+    });
+  }
+
+  /** Tears down the active Supabase real-time channel, if any. */
+  private teardownRealtimeSubscription() {
+    if (this.realtimeChannel) {
+      this.supabase.unsubscribeFromBoard(this.realtimeChannel);
+      this.realtimeChannel = null;
     }
   }
 
@@ -262,6 +296,7 @@ export class App implements OnInit {
 
   /** Returns to the boards list view. */
   goBackToList() {
+    this.teardownRealtimeSubscription();
     this.viewMode.set('list');
     this.activeBoard.set(null);
     this.columns.set([]);
