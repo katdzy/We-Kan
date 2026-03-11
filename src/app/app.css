@@ -1194,7 +1194,13 @@ a.user-email-neo:hover {
 
 .auth-tab-btn.active {
   background: #BDF522;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+/* Sign Up tab gets orange when active */
+.auth-tab-btn:last-child.active {
+  background: #F97316;
+  color: #000000;
 }
 
 /* Form Fields */
@@ -1341,19 +1347,20 @@ a.user-email-neo:hover {
 /* Email confirm pending */
 .auth-confirm-box-neo {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
   padding: 16px 0;
   margin-bottom: 8px;
 }
 
 .auth-confirm-box-neo svg {
-  color: #D1D5DB;
-  /* Light gray mail icon */
+  color: #000000;
   width: 28px;
   height: 28px;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .auth-confirm-box-neo .confirm-text-wrap {
@@ -1385,21 +1392,22 @@ a.user-email-neo:hover {
 .auth-btn-secondary {
   width: 100%;
   padding: 14px;
-  background: #1F2937;
-  /* Dark grayish-blue button */
-  border: none;
-  border-radius: 8px;
-  color: #9CA3AF;
+  background: #BDF522;
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px #000000;
+  color: #000000;
   font-family: 'DM Sans', sans-serif;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .auth-btn-secondary:hover {
-  background: #111827;
-  color: #ffffff;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #000000;
+  background: #a8d91a;
+  color: #000000;
 }
 
 /* ── Header Icons & Dropdowns ────────────────── */
