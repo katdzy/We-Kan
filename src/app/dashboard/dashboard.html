@@ -27,6 +27,9 @@
         <div class="board-card-neo" (click)="navigateToBoard(board.id)">
           <div class="board-card-top" [style.backgroundColor]="board.color || '#F97316'">
             <h4 class="board-title-neo">{{ board.title }}</h4>
+            <div class="board-type-tag" [class.group-board]="(board.member_count ?? 1) > 1">
+              {{ (board.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
+            </div>
           </div>
           <div class="board-card-bottom">
             <div class="progress-row-neo">

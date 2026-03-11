@@ -122,6 +122,33 @@ export class App implements OnInit, OnDestroy {
 
   totalCards = computed(() => this.columns().reduce((sum, col) => sum + col.cards.length, 0));
 
+  boardProgress = computed(() => {
+    let totalCards = 0;
+    let completedCards = 0;
+    const doneColumnTitle = 'Done';
+
+    for (const col of this.columns()) {
+      const isDoneColumn = col.title.toLowerCase() === doneColumnTitle.toLowerCase();
+      
+      for (const card of col.cards) {
+        totalCards++;
+        
+        if (card.subtasks && card.subtasks.length > 0) {
+          const allSubtasksDone = card.subtasks.every(st => st.done);
+          if (isDoneColumn && allSubtasksDone) {
+            completedCards++;
+          }
+        } else {
+          if (isDoneColumn) {
+            completedCards++;
+          }
+        }
+      }
+    }
+    
+    return totalCards === 0 ? 0 : Math.round((completedCards / totalCards) * 100);
+  });
+
   constructor() {
     // When session changes (login / logout), fetch boards list; clear on logout
     effect(() => {

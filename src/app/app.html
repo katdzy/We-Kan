@@ -134,6 +134,17 @@
         </button>
         <h1 class="app-title" style="margin-right: 12px;">{{ activeBoard()?.title ?? 'Board' }}</h1>
 
+        <div class="board-type-tag header-tag" [class.group-board]="(activeBoard()?.member_count ?? 1) > 1">
+          {{ (activeBoard()?.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
+        </div>
+
+        <div class="board-header-progress">
+          <div class="bhp-track">
+            <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.color || '#BDF522'"></div>
+          </div>
+          <span class="bhp-percent" [style.color]="activeBoard()?.color || '#BDF522'">{{ boardProgress() }}%</span>
+        </div>
+
         @if (isOwner()) {
         <div class="board-menu-container" style="position: relative;">
           <button class="header-icon-btn" (click)="toggleBoardMenu($event, activeBoard()!.id)" title="Board Options">
@@ -264,6 +275,9 @@
         <!-- Card Preview Top -->
         <div class="bnc-preview" [style.background]="board.color || '#BDF522'">
           <h3 class="bnc-preview-title">{{ board.title }}</h3>
+          <div class="board-type-tag" [class.group-board]="(board.member_count ?? 1) > 1">
+            {{ (board.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
+          </div>
           @if (isOwnerOfBoard(board)) {
           <div class="bnc-menu-wrap" (click)="$event.stopPropagation()">
             <button class="bnc-dots-btn" (click)="toggleBoardMenu($event, board.id)" title="Board options">
