@@ -55,4 +55,26 @@ export class AuthService {
     });
     if (error) throw error;
   }
+
+  async updateAvatar(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result as string;
+          const { error } = await this.supabase.auth.updateUser({
+            data: { avatar_url: base64 }
+          });
+          if (error) throw error;
+          resolve(base64);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  avatarUrl = computed<string | null>(() => this.user()?.user_metadata?.['avatar_url'] ?? null);
 }
