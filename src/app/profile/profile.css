@@ -27,14 +27,16 @@
 }
 
 /* ── Avatar ──────────────────────────────────── */
+/* ── Avatar wrapper ──────────────────────────── */
 .profile-avatar-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   position: relative;
 }
 
+/* ── Avatar circle ───────────────────────────── */
 .profile-avatar {
   width: 96px;
   height: 96px;
@@ -48,6 +50,7 @@
   overflow: hidden;
   position: relative;
   color: #000000;
+  cursor: pointer;
 }
 
 .avatar-img {
@@ -63,6 +66,25 @@
   line-height: 1;
 }
 
+/* ── Hover overlay — always active (both states) ─────────── */
+.avatar-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s;
+  pointer-events: none;
+}
+
+.profile-avatar:hover .avatar-hover-overlay {
+  opacity: 1;
+}
+
+/* ── Loading overlay ─────────────────────────── */
 .avatar-loading-overlay {
   position: absolute;
   inset: 0;
@@ -73,70 +95,48 @@
   border-radius: 50%;
 }
 
-.avatar-edit-btn {
-  position: absolute;
-  bottom: 0px;
-  right: -5px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #BDF522;
-  border: 3px solid #000000;
-  box-shadow: 3px 3px 0px #000000;
+/* ── Delete button — centered below avatar ───── */
+.avatar-delete-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
   cursor: pointer;
-  color: #000000;
-  transition: background 0.15s, transform 0.1s;
-  padding: 0;
-  z-index: 5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #EF4444;
+  transition: opacity 0.15s, transform 0.1s;
 }
 
-.avatar-remove-btn {
-  position: absolute;
-  bottom: 0px;
-  left: -5px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 3px solid #000000;
-  box-shadow: 3px 3px 0px #000000;
+.avatar-delete-btn:hover {
+  opacity: 0.75;
+  transform: translateY(-1px);
+}
+
+/* ── Status message slot — fixed height so layout never jumps */
+.avatar-message-slot {
+  min-height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: #EF4444; /* Bright red */
-  transition: background 0.15s, transform 0.1s;
-  padding: 0;
-  z-index: 5;
 }
 
-.avatar-remove-btn:hover {
-  background: #FEF2F2;
-  transform: translate(-1px, -1px);
-}
-
-.avatar-edit-btn:hover {
-  background: #A3D81A;
-  transform: translate(-1px, -1px);
-}
-
-.avatar-message {
+.avatar-status {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
-  margin: 0;
-  margin-top: 20px;
-  text-align: center;
+  white-space: nowrap;
 }
 
-.avatar-message.success {
+.avatar-status.success {
   color: #059669;
 }
 
-.avatar-message.error {
+.avatar-status.error {
   color: #dc2626;
 }
 
