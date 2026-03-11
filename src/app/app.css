@@ -1638,9 +1638,9 @@ a.user-email-neo:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 48px 0;
+  padding: 56px 48px 120px;
   position: relative;
-  min-height: 100px;
+  min-height: 120px;
 }
 
 .boards-page-header-text {
@@ -1653,7 +1653,7 @@ a.user-email-neo:hover {
   color: #BDF522;
   -webkit-text-stroke: 1.5px #000000;
   text-shadow: 3px 3px 0px #000000;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   line-height: 1;
   letter-spacing: 0.02em;
 }
@@ -1677,21 +1677,22 @@ a.user-email-neo:hover {
   background: #1E47F7;
   border: 2px solid #000000;
   box-shadow: 4px 4px 0px #000000;
-  padding: 12px 24px;
+  padding: 14px 28px;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   white-space: nowrap;
   position: absolute;
   right: 48px;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 40px;
 }
 
 .add-new-board-btn:hover {
+  transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px #000000;
 }
 
 .add-new-board-btn:active {
+  transform: translate(2px, 2px);
   box-shadow: 0px 0px 0px #000000;
 }
 
@@ -1700,6 +1701,7 @@ a.user-email-neo:hover {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
+  padding: 0 48px 56px;
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
@@ -1708,23 +1710,24 @@ a.user-email-neo:hover {
 @media (max-width: 1024px) {
   .boards-cards-grid {
     grid-template-columns: repeat(2, 1fr);
-    padding: 32px 32px 40px;
+    padding: 0 32px 40px;
   }
 }
 
 @media (max-width: 640px) {
   .boards-cards-grid {
     grid-template-columns: 1fr;
-    padding: 24px 20px 32px;
+    padding: 0 20px 32px;
     gap: 20px;
   }
 
   .boards-page-header {
-    padding: 32px 20px 0;
+    padding: 40px 20px 32px;
   }
 
   .add-new-board-btn {
     right: 20px;
+    bottom: 32px;
   }
 }
 
