@@ -20,10 +20,12 @@ export class Profile {
   usernameLoading = signal(false);
   emailLoading = signal(false);
   passwordLoading = signal(false);
+  avatarLoading = signal(false);
 
   usernameMessage = signal<{ type: 'success' | 'error', text: string } | null>(null);
   emailMessage = signal<{ type: 'success' | 'error', text: string } | null>(null);
   passwordMessage = signal<{ type: 'success' | 'error', text: string } | null>(null);
+  avatarMessage = signal<{ type: 'success' | 'error', text: string } | null>(null);
 
   /** First letter of the user's email for the avatar */
   userInitial = computed(() => {
@@ -111,6 +113,36 @@ export class Profile {
       this.passwordMessage.set({ type: 'error', text: err?.message || 'Failed to update password.' });
     } finally {
       this.passwordLoading.set(false);
+    }
+  }
+
+  triggerAvatarUpload() {
+    const input = document.getElementById('avatar-file-input') as HTMLInputElement;
+    input?.click();
+  }
+
+  async onAvatarFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowed.includes(file.type)) {
+      this.avatarMessage.set({ type: 'error', text: 'Please select a JPG, PNG, WebP or GIF image.' });
+      return;
+    }
+
+    this.avatarLoading.set(true);
+    this.avatarMessage.set(null);
+    try {
+      await this.authService.updateAvatar(file);
+      this.avatarMessage.set({ type: 'success', text: 'Profile picture updated!' });
+      this.autoDismiss(v => this.avatarMessage.set(v));
+    } catch (err: any) {
+      this.avatarMessage.set({ type: 'error', text: err?.message || 'Failed to upload avatar.' });
+    } finally {
+      this.avatarLoading.set(false);
+      input.value = '';
     }
   }
 
