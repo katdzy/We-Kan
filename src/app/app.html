@@ -1,28 +1,31 @@
 <!-- ── Auth Screen ──────────────────────────────────── -->
 @if (!authService.session()) {
 <div class="auth-screen">
-  <div class="auth-card">
-    <!-- Logo -->
-    <div class="auth-logo">
-      <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="12" height="12" rx="3" fill="#6366f1" />
-        <rect x="15" width="13" height="7" rx="3" fill="#8b5cf6" />
-        <rect x="15" y="10" width="13" height="18" rx="3" fill="#a78bfa" />
-        <rect y="15" width="12" height="13" rx="3" fill="#818cf8" />
-      </svg>
+  <div class="auth-card-neo">
+    <!-- Logo & Title -->
+    <div class="auth-header-neo">
+      <div class="auth-logo-icon">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="#BDF522" stroke="#000000" stroke-width="2">
+          <!-- Left side tall rectangle -->
+          <rect x="3" y="3" width="8" height="18" rx="2" />
+          <!-- Right side top square -->
+          <rect x="13" y="3" width="8" height="9" rx="2" />
+          <!-- Right side bottom square -->
+          <rect x="13" y="14" width="8" height="7" rx="2" />
+        </svg>
+      </div>
+      <h1 class="auth-title-neo">We-Kan</h1>
+      <p class="auth-subtitle-neo">Sign in to manage your tasks</p>
     </div>
-    <h1 class="auth-title">Kanban Board</h1>
-    <p class="auth-subtitle">Sign in to manage your tasks</p>
 
-    <!-- Tab switcher -->
-    <div class="auth-tabs">
-      <button class="auth-tab" [class.active]="authMode() === 'login'" (click)="setAuthMode('login')">Sign In</button>
-      <button class="auth-tab" [class.active]="authMode() === 'signup'" (click)="setAuthMode('signup')">Sign Up</button>
+    <!-- Tabs -->
+    <div class="auth-tabs-neo">
+      <button class="auth-tab-btn" [class.active]="authMode() === 'login'" (click)="setAuthMode('login')">Sign In</button>
+      <button class="auth-tab-btn" [class.active]="authMode() === 'signup'" (click)="setAuthMode('signup')">Sign Up</button>
     </div>
 
     @if (signupConfirmPending()) {
-    <!-- Email confirmation pending -->
-    <div class="auth-confirm-box">
+    <div class="auth-confirm-box-neo">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -30,30 +33,27 @@
       </svg>
       <div>
         <p class="confirm-title">Check your email</p>
-        <p class="confirm-body">We sent a confirmation link to <strong>{{ authEmail() }}</strong>. Click it to activate
-          your account, then sign in.</p>
+        <p class="confirm-body">We sent a link to <strong>{{ authEmail() }}</strong>.</p>
       </div>
     </div>
     <button class="auth-btn-secondary" (click)="setAuthMode('login')">Back to Sign In</button>
     } @else {
-    <!-- Auth form -->
-    <form class="auth-form" (submit)="$event.preventDefault(); submitAuth()">
-      <div class="auth-field">
+    <form class="auth-form-neo" (submit)="$event.preventDefault(); submitAuth()">
+      <div class="auth-field-neo">
         <label for="auth-email">Email</label>
-        <input id="auth-email" type="email" placeholder="you@example.com" [value]="authEmail()"
-          (input)="authEmail.set($any($event.target).value)" class="auth-input" autocomplete="email" required />
+        <input id="auth-email" type="email" placeholder="name@email.com" [value]="authEmail()"
+          (input)="authEmail.set($any($event.target).value)" class="auth-input-neo" autocomplete="email" required />
       </div>
 
-      <div class="auth-field">
+      <div class="auth-field-neo">
         <label for="auth-password">Password</label>
         <input id="auth-password" type="password"
-          [placeholder]="authMode() === 'signup' ? 'Min. 6 characters' : 'Your password'" [value]="authPassword()"
-          (input)="authPassword.set($any($event.target).value)" class="auth-input" autocomplete="current-password"
-          required />
+          placeholder="Enter password" [value]="authPassword()"
+          (input)="authPassword.set($any($event.target).value)" class="auth-input-neo" autocomplete="current-password" required />
       </div>
 
       @if (authError()) {
-      <div class="auth-error">
+      <div class="auth-error-neo">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10" />
@@ -64,23 +64,18 @@
       </div>
       }
 
-      <button type="submit" class="auth-submit" [disabled]="authLoading() || !authEmail().trim() || !authPassword()">
-        @if (authLoading()) {
-        <span class="auth-spinner"></span>
-        }
-        {{ authMode() === 'login' ? 'Sign In' : 'Create Account' }}
+      <button type="submit" class="auth-submit-neo" [disabled]="authLoading() || !authEmail().trim() || !authPassword()">
+        @if (authLoading()) { <span class="spinner"></span> }
+        {{ authMode() === 'login' ? 'Sign In' : 'Sign Up' }}
       </button>
-    </form>
 
-    <p class="auth-switch">
-      @if (authMode() === 'login') {
-      Don't have an account?
-      <button class="auth-switch-btn" (click)="setAuthMode('signup')">Sign up</button>
-      } @else {
-      Already have an account?
-      <button class="auth-switch-btn" (click)="setAuthMode('login')">Sign in</button>
-      }
-    </p>
+      <p class="auth-switch-text">
+        <span class="auth-switch-muted">{{ authMode() === 'login' ? "Don't have an account?" : "Already have an account?" }}</span>
+        <a href="javascript:void(0)" (click)="setAuthMode(authMode() === 'login' ? 'signup' : 'login')">
+          {{ authMode() === 'login' ? 'Sign Up' : 'Sign In' }}
+        </a>
+      </p>
+    </form>
     }
   </div>
 </div>
