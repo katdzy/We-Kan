@@ -195,11 +195,16 @@
     <a class="user-email-neo" routerLink="/profile" title="Profile">{{ authService.username() ||
       authService.user()?.email }}</a>
     <button class="profile-btn-neo circle-profile" routerLink="/profile" title="Profile">
+      @if (authService.avatarUrl() && router.url === '/profile') {
+      <img [src]="authService.avatarUrl()" alt="avatar"
+        style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+      } @else {
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
         <circle cx="12" cy="7" r="4"></circle>
       </svg>
+      }
     </button>
 
     <div class="header-separator-neo"></div>
