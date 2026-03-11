@@ -31,6 +31,15 @@
                 </button>
                 <input id="avatar-file-input" type="file" accept="image/*" style="display:none"
                     (change)="onAvatarFileSelected($event)" />
+                @if (authService.avatarUrl()) {
+                <button class="avatar-remove-btn" (click)="removeAvatar()" title="Remove profile picture">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+                }
                 @if (avatarMessage()) {
                 <p class="avatar-message" [class.success]="avatarMessage()?.type === 'success'"
                     [class.error]="avatarMessage()?.type === 'error'">

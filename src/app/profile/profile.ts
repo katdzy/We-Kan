@@ -1,9 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-profile',
+  imports: [FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -117,6 +119,20 @@ export class Profile {
   triggerAvatarUpload() {
     const input = document.getElementById('avatar-file-input') as HTMLInputElement;
     input?.click();
+  }
+
+  async removeAvatar() {
+    this.avatarLoading.set(true);
+    this.avatarMessage.set(null);
+    try {
+      await this.authService.removeAvatar();
+      this.avatarMessage.set({ type: 'success', text: 'Profile picture removed.' });
+      this.autoDismiss(v => this.avatarMessage.set(v));
+    } catch (err: any) {
+      this.avatarMessage.set({ type: 'error', text: err?.message || 'Failed to remove avatar.' });
+    } finally {
+      this.avatarLoading.set(false);
+    }
   }
 
   async onAvatarFileSelected(event: Event) {

@@ -57,30 +57,40 @@ export class AuthService {
   }
 
   async updateAvatar(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result as string;
+          const { error } = await this.supabase.auth.updateUser({
+            data: { avatar_url: base64 }
+          });
+          if (error) throw error;
+          resolve(base64);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async removeAvatar(): Promise<void> {
     const user = this.user();
     if (!user) throw new Error('Not authenticated');
 
-    const fileExt = file.name.split('.').pop();
-    const filePath = `avatars/${user.id}.${fileExt}`;
+    // Delete from storage if it's a storage URL
+    const currentUrl = this.avatarUrl();
+    if (currentUrl && currentUrl.includes('/storage/')) {
+      const filePath = `avatars/${user.id}`;
+      await this.supabase.storage.from('avatars').remove([filePath]);
+    }
 
-    const { error: uploadError } = await this.supabase.storage
-      .from('avatars')
-      .upload(filePath, file, { upsert: true });
-
-    if (uploadError) throw uploadError;
-
-    const { data } = this.supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-
-    const publicUrl = data.publicUrl;
-
-    const { error: updateError } = await this.supabase.auth.updateUser({
-      data: { avatar_url: publicUrl }
+    const { error } = await this.supabase.auth.updateUser({
+      data: { avatar_url: null }
     });
-
-    if (updateError) throw updateError;
-    return publicUrl;
+    if (error) throw error;
   }
 
   avatarUrl = computed<string | null>(() => this.user()?.user_metadata?.['avatar_url'] ?? null);

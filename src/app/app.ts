@@ -122,7 +122,7 @@ export class App implements OnInit, OnDestroy {
 
   totalCards = computed(() => this.columns().reduce((sum, col) => sum + col.cards.length, 0));
 
-  boardProgress = computed(() => {
+  public boardProgress = computed<number>(() => {
     let totalCards = 0;
     let completedCards = 0;
     const doneColumnTitle = 'Done';
