@@ -1,902 +1,872 @@
 <!-- ── Auth Screen ──────────────────────────────────── -->
 @if (!authService.session()) {
-  <div class="auth-screen">
-    <div class="auth-card">
-      <!-- Logo -->
-      <div class="auth-logo">
-        <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="12" height="12" rx="3" fill="#6366f1"/>
-          <rect x="15" width="13" height="7" rx="3" fill="#8b5cf6"/>
-          <rect x="15" y="10" width="13" height="18" rx="3" fill="#a78bfa"/>
-          <rect y="15" width="12" height="13" rx="3" fill="#818cf8"/>
-        </svg>
-      </div>
-      <h1 class="auth-title">Kanban Board</h1>
-      <p class="auth-subtitle">Sign in to manage your tasks</p>
-
-      <!-- Tab switcher -->
-      <div class="auth-tabs">
-        <button
-          class="auth-tab"
-          [class.active]="authMode() === 'login'"
-          (click)="setAuthMode('login')"
-        >Sign In</button>
-        <button
-          class="auth-tab"
-          [class.active]="authMode() === 'signup'"
-          (click)="setAuthMode('signup')"
-        >Sign Up</button>
-      </div>
-
-      @if (signupConfirmPending()) {
-        <!-- Email confirmation pending -->
-        <div class="auth-confirm-box">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-          </svg>
-          <div>
-            <p class="confirm-title">Check your email</p>
-            <p class="confirm-body">We sent a confirmation link to <strong>{{ authEmail() }}</strong>. Click it to activate your account, then sign in.</p>
-          </div>
-        </div>
-        <button class="auth-btn-secondary" (click)="setAuthMode('login')">Back to Sign In</button>
-      } @else {
-        <!-- Auth form -->
-        <form class="auth-form" (submit)="$event.preventDefault(); submitAuth()">
-          <div class="auth-field">
-            <label for="auth-email">Email</label>
-            <input
-              id="auth-email"
-              type="email"
-              placeholder="you@example.com"
-              [value]="authEmail()"
-              (input)="authEmail.set($any($event.target).value)"
-              class="auth-input"
-              autocomplete="email"
-              required
-            />
-          </div>
-
-          <div class="auth-field">
-            <label for="auth-password">Password</label>
-            <input
-              id="auth-password"
-              type="password"
-              [placeholder]="authMode() === 'signup' ? 'Min. 6 characters' : 'Your password'"
-              [value]="authPassword()"
-              (input)="authPassword.set($any($event.target).value)"
-              class="auth-input"
-              autocomplete="current-password"
-              required
-            />
-          </div>
-
-          @if (authError()) {
-            <div class="auth-error">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              {{ authError() }}
-            </div>
-          }
-
-          <button
-            type="submit"
-            class="auth-submit"
-            [disabled]="authLoading() || !authEmail().trim() || !authPassword()"
-          >
-            @if (authLoading()) {
-              <span class="auth-spinner"></span>
-            }
-            {{ authMode() === 'login' ? 'Sign In' : 'Create Account' }}
-          </button>
-        </form>
-
-        <p class="auth-switch">
-          @if (authMode() === 'login') {
-            Don't have an account?
-            <button class="auth-switch-btn" (click)="setAuthMode('signup')">Sign up</button>
-          } @else {
-            Already have an account?
-            <button class="auth-switch-btn" (click)="setAuthMode('login')">Sign in</button>
-          }
-        </p>
-      }
+<div class="auth-screen">
+  <div class="auth-card">
+    <!-- Logo -->
+    <div class="auth-logo">
+      <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="12" height="12" rx="3" fill="#6366f1" />
+        <rect x="15" width="13" height="7" rx="3" fill="#8b5cf6" />
+        <rect x="15" y="10" width="13" height="18" rx="3" fill="#a78bfa" />
+        <rect y="15" width="12" height="13" rx="3" fill="#818cf8" />
+      </svg>
     </div>
+    <h1 class="auth-title">Kanban Board</h1>
+    <p class="auth-subtitle">Sign in to manage your tasks</p>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button class="auth-tab" [class.active]="authMode() === 'login'" (click)="setAuthMode('login')">Sign In</button>
+      <button class="auth-tab" [class.active]="authMode() === 'signup'" (click)="setAuthMode('signup')">Sign Up</button>
+    </div>
+
+    @if (signupConfirmPending()) {
+    <!-- Email confirmation pending -->
+    <div class="auth-confirm-box">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </svg>
+      <div>
+        <p class="confirm-title">Check your email</p>
+        <p class="confirm-body">We sent a confirmation link to <strong>{{ authEmail() }}</strong>. Click it to activate
+          your account, then sign in.</p>
+      </div>
+    </div>
+    <button class="auth-btn-secondary" (click)="setAuthMode('login')">Back to Sign In</button>
+    } @else {
+    <!-- Auth form -->
+    <form class="auth-form" (submit)="$event.preventDefault(); submitAuth()">
+      <div class="auth-field">
+        <label for="auth-email">Email</label>
+        <input id="auth-email" type="email" placeholder="you@example.com" [value]="authEmail()"
+          (input)="authEmail.set($any($event.target).value)" class="auth-input" autocomplete="email" required />
+      </div>
+
+      <div class="auth-field">
+        <label for="auth-password">Password</label>
+        <input id="auth-password" type="password"
+          [placeholder]="authMode() === 'signup' ? 'Min. 6 characters' : 'Your password'" [value]="authPassword()"
+          (input)="authPassword.set($any($event.target).value)" class="auth-input" autocomplete="current-password"
+          required />
+      </div>
+
+      @if (authError()) {
+      <div class="auth-error">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        {{ authError() }}
+      </div>
+      }
+
+      <button type="submit" class="auth-submit" [disabled]="authLoading() || !authEmail().trim() || !authPassword()">
+        @if (authLoading()) {
+        <span class="auth-spinner"></span>
+        }
+        {{ authMode() === 'login' ? 'Sign In' : 'Create Account' }}
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      @if (authMode() === 'login') {
+      Don't have an account?
+      <button class="auth-switch-btn" (click)="setAuthMode('signup')">Sign up</button>
+      } @else {
+      Already have an account?
+      <button class="auth-switch-btn" (click)="setAuthMode('login')">Sign in</button>
+      }
+    </p>
+    }
   </div>
+</div>
 }
 
 @if (authService.session()) {
-  <!-- Loading state -->
-  @if (loading()) {
-    <div class="board-loading">
-      <div class="loading-spinner"></div>
-      <span>Loading board…</span>
-    </div>
-  }
+<!-- Loading state -->
+@if (loading()) {
+<div class="board-loading">
+  <div class="loading-spinner"></div>
+  <span>Loading board…</span>
+</div>
+}
 
-  <!-- Error state -->
-  @if (error()) {
-    <div class="board-error">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+<!-- Error state -->
+@if (error()) {
+<div class="board-error">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="8" x2="12" y2="12" />
+    <line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+  {{ error() }}
+  <button class="btn-secondary" style="margin-left:12px;padding:4px 12px;" (click)="loadBoard()">Retry</button>
+</div>
+}
+
+<!-- Header -->
+<header class="app-header">
+  <div class="header-left">
+    <div class="logo-branding" routerLink="/" style="cursor: pointer;" title="Home">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
+        style="margin-right: 12px; overflow: visible;">
+        <rect width="12" height="12" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
+        <rect x="15" width="13" height="7" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
+        <rect x="15" y="10" width="13" height="18" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
+        <rect y="15" width="12" height="13" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
       </svg>
-      {{ error() }}
-      <button class="btn-secondary" style="margin-left:12px;padding:4px 12px;" (click)="loadBoard()">Retry</button>
+      We-Kan
     </div>
-  }
+    <div>
+      @if (viewMode() === 'board') {
+      <div style="display:flex;align-items:center;gap:12px;margin-left:40px;">
+        <button class="back-to-boards-btn" (click)="goBackToList()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Boards
+        </button>
+        <h1 class="app-title" style="margin-right: 12px;">{{ activeBoard()?.title ?? 'Board' }}</h1>
 
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-left">
-      <div class="logo" routerLink="/" style="cursor: pointer;" title="Home">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="12" height="12" rx="3" fill="#6366f1"/>
-          <rect x="15" width="13" height="7" rx="3" fill="#8b5cf6"/>
-          <rect x="15" y="10" width="13" height="18" rx="3" fill="#a78bfa"/>
-          <rect y="15" width="12" height="13" rx="3" fill="#818cf8"/>
-        </svg>
-      </div>
-      <div>
-        @if (viewMode() === 'board') {
-          <div style="display:flex;align-items:center;gap:12px;">
-            <button class="back-to-boards-btn" (click)="goBackToList()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6"/>
-              </svg>
-              Boards
-            </button>
-            <h1 class="app-title" style="margin-right: 12px;">{{ activeBoard()?.title ?? 'Board' }}</h1>
-
-            @if (isOwner()) {
-              <div class="board-menu-container" style="position: relative;">
-                <button class="header-icon-btn" (click)="toggleBoardMenu($event, activeBoard()!.id)" title="Board Options">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="1"></circle>
-                    <circle cx="19" cy="12" r="1"></circle>
-                    <circle cx="5" cy="12" r="1"></circle>
-                  </svg>
-                </button>
-                @if (openBoardMenuId() === activeBoard()!.id) {
-                  <div class="board-dropdown-menu">
-                    <button class="dropdown-item" (click)="openEditBoardModal($event, activeBoard())">Edit Board</button>
-                    <button class="dropdown-item danger" (click)="openDeleteBoardModal($event, activeBoard()!.id)">Delete Board</button>
-                  </div>
-                }
-              </div>
-            }
-
-            <button class="header-icon-btn" (click)="toggleActivityPanel()" title="Activity">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              <span class="icon-label">Activity Log</span>
-            </button>
-          </div>
-          <p class="app-subtitle">{{ totalCards() }} tasks across {{ columns().length }} columns</p>
-        } @else {
-          <h1 class="app-title">Boards</h1>
-          <p class="app-subtitle">Select a board to open</p>
-        }
-      </div>
-    </div>
-
-    <nav class="app-navbar">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Dashboard</a>
-      <a routerLink="/boards" routerLinkActive="active" class="nav-link">Boards</a>
-      <a routerLink="/profile" routerLinkActive="active" class="nav-link">Profile</a>
-    </nav>
-
-    <!-- User info + actions -->
-    <div class="header-right">
-      <div class="header-actions">
-        <!-- Members Button (Owner only) -->
         @if (isOwner()) {
-          <button class="header-icon-btn" (click)="openInviteModal()" title="Members">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        <div class="board-menu-container" style="position: relative;">
+          <button class="header-icon-btn" (click)="toggleBoardMenu($event, activeBoard()!.id)" title="Board Options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="19" cy="12" r="1"></circle>
+              <circle cx="5" cy="12" r="1"></circle>
             </svg>
-            <span class="icon-label">Members</span>
           </button>
-        }
-      </div>
-
-      <div class="header-divider"></div>
-
-      <span class="user-email">{{ authService.username() || authService.user()?.email }}</span>
-      <button class="header-icon-btn" routerLink="/profile" title="Profile" style="margin-left: 8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span class="icon-label">Profile</span>
-      </button>
-      <button class="sign-out-btn" (click)="signOut()" title="Sign out" style="margin-left: 8px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        Sign out
-      </button>
-    </div>
-  </header>
-
-  <!-- Main content area -->
-  <main class="board-container">
-    @if (router.url.startsWith('/boards')) {
-
-      <!-- ── Boards List View ── -->
-      @if (viewMode() === 'list') {
-        <div class="boards-list-view">
-          @if (loading()) {
-            <div class="boards-list-grid">
-              @for (i of [1,2,3]; track i) {
-                <div class="board-list-card skeleton"></div>
-              }
-            </div>
-          } @else if (error()) {
-            <div class="boards-list-empty">⚠️ {{ error() }}</div>
-          } @else if (accessibleBoards().length === 0) {
-            <div class="boards-list-empty">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-              </svg>
-              <p>No boards yet.</p>
-            </div>
-          } @else {
-            <div class="boards-list-grid">
-              @for (board of accessibleBoards(); track board.id) {
-                <div class="board-list-card" (click)="selectBoard(board.id)">
-                  <div class="blc-icon" [style.background]="board.color || '#BDF522'" style="color: rgba(0,0,0,0.4)">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                    </svg>
-                  </div>
-                  <div class="blc-body">
-                    <div class="blc-title-row">
-                      <span class="blc-title">{{ board.title }}</span>
-                      <span class="board-type-tag" [class.group]="(board.member_count || 0) > 1">
-                        {{ (board.member_count || 0) <= 1 ? 'Personal' : 'Group' }}
-                      </span>
-                    </div>
-                    <span class="blc-role">{{ isOwnerOfBoard(board) ? 'Owner' : 'Member' }}</span>
-                    @if (board.progress !== undefined) {
-                      <div class="blc-progress" style="margin-top: 8px;">
-                        <div class="progress-header" style="display:flex;justify-content:space-between;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;">
-                          <span>Progress</span>
-                          <span>{{ board.progress }}%</span>
-                        </div>
-                        <div class="progress-track" style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
-                          <div class="progress-fill" [style.width.%]="board.progress" style="height:100%;background:#10b981;border-radius:2px;transition:width 0.3s ease;"></div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                  <div class="blc-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                  </div>
-                </div>
-              }
-              <div class="board-list-card add-board-card" (click)="openCreateBoardModal()">
-                <div class="blc-icon add-icon">
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                </div>
-                <div class="blc-body">
-                  <span class="blc-title">Create New Board</span>
-                  <span class="blc-role">Start Fresh</span>
-                </div>
-              </div>
-            </div>
+          @if (openBoardMenuId() === activeBoard()!.id) {
+          <div class="board-dropdown-menu">
+            <button class="dropdown-item" (click)="openEditBoardModal($event, activeBoard())">Edit Board</button>
+            <button class="dropdown-item danger" (click)="openDeleteBoardModal($event, activeBoard()!.id)">Delete
+              Board</button>
+          </div>
           }
         </div>
-      }
+        }
 
-      <!-- ── Kanban Board View ── -->
-      @if (viewMode() === 'board') {
-        <div class="board">
-        @for (column of columns(); track trackColumn($index, column)) {
-          <div
-            class="column"
-            [class.drag-over]="dragOverColumnId() === column.id"
-            (dragover)="onDragOver($event, column.id)"
-            (drop)="onDrop($event, column.id)"
-          >
-            <!-- Column Header -->
-            <div class="column-header">
-              <div class="column-title-row">
-                <span class="column-dot" [style.background]="column.color"></span>
-                <h2 class="column-title">{{ column.title }}</h2>
-                <span class="column-count">{{ column.cards.length }}</span>
+      </div>
+      } @else {
+      <h1 class="app-title">Dashboard</h1>
+      <p class="app-subtitle">Select a board to open</p>
+      }
+    </div>
+  </div>
+
+  <nav class="app-navbar">
+    @if (viewMode() === 'board') {
+    @if (isOwner()) {
+    <button class="board-nav-tool" (click)="openInviteModal()" title="Members">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      Members
+    </button>
+    }
+    <button class="board-nav-tool" (click)="toggleActivityPanel()" title="Activity">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      Activity Log
+    </button>
+    } @else {
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Dashboard</a>
+    <a routerLink="/boards" routerLinkActive="active" class="nav-link">Boards</a>
+    }
+  </nav>
+
+  <!-- User info + actions -->
+  <div class="header-right">
+    <a class="user-email-neo" routerLink="/profile" title="Profile">{{ authService.username() ||
+      authService.user()?.email }}</a>
+    <button class="profile-btn-neo circle-profile" routerLink="/profile" title="Profile">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </button>
+
+    <div class="header-separator-neo"></div>
+
+    <button class="sign-out-btn-neo" (click)="signOut()" title="Sign out">
+      Sign out
+    </button>
+  </div>
+</header>
+
+<!-- Main content area -->
+<main class="board-container">
+  @if (router.url.startsWith('/boards')) {
+
+  <!-- ── Boards List View ── -->
+  @if (viewMode() === 'list') {
+  <div class="boards-list-view">
+
+    <!-- Page Header -->
+    <div class="boards-page-header">
+      <div class="boards-page-header-text">
+        <h1 class="boards-page-title">Boards</h1>
+        <p class="boards-page-subtitle">View your projects and manage your boards.</p>
+      </div>
+      <button class="add-new-board-btn" (click)="openCreateBoardModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Add New Board
+      </button>
+    </div>
+
+    @if (loading()) {
+    <div class="boards-cards-grid">
+      @for (i of [1,2,3]; track i) {
+      <div class="board-neo-card skeleton-neo"></div>
+      }
+    </div>
+    } @else if (error()) {
+    <div class="boards-list-empty">⚠️ {{ error() }}</div>
+    } @else if (accessibleBoards().length === 0) {
+    <div class="boards-list-empty">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </svg>
+      <p>No boards yet. Create your first board!</p>
+    </div>
+    } @else {
+    <div class="boards-cards-grid">
+      @for (board of accessibleBoards(); track board.id) {
+      <div class="board-neo-card">
+        <!-- Card Preview Top -->
+        <div class="bnc-preview" [style.background]="board.color || '#BDF522'">
+          @if (isOwnerOfBoard(board)) {
+          <div class="bnc-menu-wrap" (click)="$event.stopPropagation()">
+            <button class="bnc-dots-btn" (click)="toggleBoardMenu($event, board.id)" title="Board options">
+              <svg width="5" height="18" viewBox="0 0 5 20" fill="currentColor">
+                <circle cx="2.5" cy="2.5" r="2.5" />
+                <circle cx="2.5" cy="10" r="2.5" />
+                <circle cx="2.5" cy="17.5" r="2.5" />
+              </svg>
+            </button>
+            @if (openBoardMenuId() === board.id) {
+            <div class="board-dropdown-menu list-card-dropdown">
+              <button class="dropdown-item" (click)="openEditBoardModal($event, board)">Edit Board</button>
+              <button class="dropdown-item danger" (click)="openDeleteBoardModal($event, board.id)">Delete
+                Board</button>
+            </div>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Card Bottom -->
+        <div class="bnc-info">
+          <h3 class="bnc-title">{{ board.title }}</h3>
+          <div class="bnc-progress-row">
+            <div class="bnc-progress-left">
+              <span class="bnc-progress-label">Progress Summary</span>
+              <div class="bnc-progress-track">
+                <div class="bnc-progress-fill" [style.width.%]="board.progress"
+                  [style.background]="board.color || '#BDF522'"></div>
               </div>
-              <button class="add-card-btn" (click)="openAddModal(column.id)" title="Add card">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </div>
+            <span class="bnc-percent" [style.color]="board.color || '#BDF522'">{{ board.progress }}%</span>
+          </div>
+          <div class="bnc-footer">
+            <button class="bnc-view-btn" [style.background]="board.color || '#BDF522'" (click)="selectBoard(board.id)">
+              View
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+
+  <!-- ── Kanban Board View ── -->
+  @if (viewMode() === 'board') {
+  <div class="board">
+    @for (column of columns(); track trackColumn($index, column)) {
+    <div class="column" [class.drag-over]="dragOverColumnId() === column.id" (dragover)="onDragOver($event, column.id)"
+      (drop)="onDrop($event, column.id)">
+      <!-- Column Header -->
+      <div class="column-header">
+        <div class="column-title-row">
+          <span class="column-dot" [style.background]="column.color"></span>
+          <h2 class="column-title">{{ column.title }}</h2>
+          <span class="column-count">{{ column.cards.length }}</span>
+        </div>
+        <button class="add-card-btn" (click)="openAddModal(column.id)" title="Add card">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="column-accent-bar" [style.background]="column.color"></div>
+
+      <!-- Cards -->
+      <div class="cards-list">
+        @for (card of column.cards; track trackCard($index, card)) {
+        <div class="card" draggable="true" [class.drag-over-card]="dragOverCardId() === card.id"
+          (dragstart)="onDragStart($event, card, column.id)" (dragend)="onDragEnd($event)"
+          (dragover)="onDragOver($event, column.id, card.id)" (drop)="onDrop($event, column.id, card.id)">
+          <!-- Card Header -->
+          <div class="card-header">
+            @if (card.tag) {
+            <span class="card-tag">{{ card.tag }}</span>
+            }
+            <div class="card-actions">
+              <button class="card-action-btn" (click)="openEditModal(card, column.id)" title="Edit">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button class="card-action-btn delete" (click)="deleteCard(card.id, column.id)" title="Delete">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4h6v2" />
                 </svg>
               </button>
             </div>
+          </div>
 
-            <div class="column-accent-bar" [style.background]="column.color"></div>
+          <h3 class="card-title">{{ card.title }}</h3>
 
-            <!-- Cards -->
-            <div class="cards-list">
-              @for (card of column.cards; track trackCard($index, card)) {
-                <div
-                  class="card"
-                  draggable="true"
-                  [class.drag-over-card]="dragOverCardId() === card.id"
-                  (dragstart)="onDragStart($event, card, column.id)"
-                  (dragend)="onDragEnd($event)"
-                  (dragover)="onDragOver($event, column.id, card.id)"
-                  (drop)="onDrop($event, column.id, card.id)"
-                >
-                  <!-- Card Header -->
-                  <div class="card-header">
-                    @if (card.tag) {
-                      <span class="card-tag">{{ card.tag }}</span>
-                    }
-                    <div class="card-actions">
-                      <button class="card-action-btn" (click)="openEditModal(card, column.id)" title="Edit">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                      </button>
-                      <button class="card-action-btn delete" (click)="deleteCard(card.id, column.id)" title="Delete">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
+          @if (card.description) {
+          <p class="card-description">{{ card.description }}</p>
+          }
 
-                  <h3 class="card-title">{{ card.title }}</h3>
-
-                  @if (card.description) {
-                    <p class="card-description">{{ card.description }}</p>
-                  }
-
-                  <!-- Progress bar -->
-                  @if (card.subtasks.length > 0) {
-                    <div class="card-progress">
-                      <div class="progress-header">
-                        <span class="progress-label">Progress</span>
-                        <span class="progress-fraction">{{ doneCount(card) }}/{{ card.subtasks.length }}</span>
-                      </div>
-                      <div class="progress-track">
-                        <div
-                          class="progress-fill"
-                          [style.width.%]="progress(card)"
-                          [class.progress-complete]="progress(card) === 100"
-                        ></div>
-                      </div>
-                    </div>
-
-                    <!-- Subtasks list -->
-                    <ul class="subtask-list">
-                      @for (subtask of card.subtasks; track trackSubtask($index, subtask)) {
-                        <li class="subtask-item" [class.subtask-done]="subtask.done">
-                          <button
-                            class="subtask-checkbox"
-                            [class.checked]="subtask.done"
-                            (click)="toggleSubtask(card.id, column.id, subtask.id)"
-                            [attr.aria-label]="subtask.done ? 'Mark incomplete' : 'Mark complete'"
-                          >
-                            @if (subtask.done) {
-                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="2 6 5 9 10 3"/>
-                              </svg>
-                            }
-                          </button>
-                          <span class="subtask-title">{{ subtask.title }}</span>
-                        </li>
-                      }
-                    </ul>
-                  }
-
-                  <!-- Card Footer -->
-                  <div class="card-footer">
-                    <span class="priority-badge" [class]="'priority-' + card.priority">
-                      <span class="priority-dot"></span>
-                      {{ card.priority }}
-                    </span>
-                    <div class="drag-handle">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                        <line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              }
-
-              <!-- Empty state drop zone -->
-              @if (column.cards.length === 0) {
-                <div
-                  class="empty-drop-zone"
-                  (dragover)="onDragOver($event, column.id)"
-                  (drop)="onDrop($event, column.id)"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="12" x2="15" y2="12"/>
-                  </svg>
-                  <span>Drop cards here</span>
-                </div>
-              }
+          <!-- Progress bar -->
+          @if (card.subtasks.length > 0) {
+          <div class="card-progress">
+            <div class="progress-header">
+              <span class="progress-label">Progress</span>
+              <span class="progress-fraction">{{ doneCount(card) }}/{{ card.subtasks.length }}</span>
             </div>
-
-            <!-- Add card button at bottom -->
-            <button class="add-card-bottom-btn" (click)="openAddModal(column.id)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Add card
-            </button>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="progress(card)"
+                [class.progress-complete]="progress(card) === 100"></div>
+            </div>
           </div>
+
+          <!-- Subtasks list -->
+          <ul class="subtask-list">
+            @for (subtask of card.subtasks; track trackSubtask($index, subtask)) {
+            <li class="subtask-item" [class.subtask-done]="subtask.done">
+              <button class="subtask-checkbox" [class.checked]="subtask.done"
+                (click)="toggleSubtask(card.id, column.id, subtask.id)"
+                [attr.aria-label]="subtask.done ? 'Mark incomplete' : 'Mark complete'">
+                @if (subtask.done) {
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3" />
+                </svg>
+                }
+              </button>
+              <span class="subtask-title">{{ subtask.title }}</span>
+            </li>
+            }
+          </ul>
+          }
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <span class="priority-badge" [class]="'priority-' + card.priority">
+              <span class="priority-dot"></span>
+              {{ card.priority }}
+            </span>
+            <div class="drag-handle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <line x1="4" y1="8" x2="20" y2="8" />
+                <line x1="4" y1="16" x2="20" y2="16" />
+              </svg>
+            </div>
+          </div>
+        </div>
         }
-        </div>
-      }
 
-    } @else {
-      <router-outlet></router-outlet>
+        <!-- Empty state drop zone -->
+        @if (column.cards.length === 0) {
+        <div class="empty-drop-zone" (dragover)="onDragOver($event, column.id)" (drop)="onDrop($event, column.id)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3" />
+            <line x1="9" y1="12" x2="15" y2="12" />
+          </svg>
+          <span>Drop cards here</span>
+        </div>
+        }
+      </div>
+
+      <!-- Add card button at bottom -->
+      <button class="add-card-bottom-btn" (click)="openAddModal(column.id)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Add card
+      </button>
+    </div>
     }
-  </main>
-
-  <!-- ── Add Card Modal ──────────────────────────────────── -->
-  @if (showAddModal()) {
-    <div class="modal-backdrop" (click)="closeAddModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Add New Card</h2>
-          <button class="modal-close" (click)="closeAddModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <label>Title <span class="required">*</span></label>
-          <input type="text" placeholder="Card title..." [value]="newCard().title ?? ''" (input)="updateNewCard({ title: $any($event.target).value })" class="modal-input" autofocus />
-
-          <label>Description</label>
-          <textarea placeholder="Add a brief description..." [value]="newCard().description ?? ''" (input)="updateNewCard({ description: $any($event.target).value })" class="modal-textarea" rows="2"></textarea>
-
-          <label>Tag</label>
-          <input type="text" placeholder="e.g. Design, Backend, Bug..." [value]="newCard().tag ?? ''" (input)="updateNewCard({ tag: $any($event.target).value })" class="modal-input" />
-
-          <label>Priority</label>
-          <div class="priority-select">
-            @for (p of ['low', 'medium', 'high']; track p) {
-              <button
-                class="priority-option"
-                [class]="'priority-option priority-option-' + p + (newCard().priority === p ? ' selected' : '')"
-                (click)="updateNewCard({ priority: $any(p) })"
-              >
-                <span class="priority-dot"></span>{{ p }}
-              </button>
-            }
-          </div>
-
-          <label>Subtasks</label>
-          @if (newCard().subtasks.length > 0) {
-            <ul class="modal-subtask-list">
-              @for (s of newCard().subtasks; track s.id) {
-                <li class="modal-subtask-item">
-                  <button class="modal-subtask-check" [class.checked]="s.done" (click)="s.done = !s.done">
-                    @if (s.done) {
-                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="2 6 5 9 10 3"/>
-                      </svg>
-                    }
-                  </button>
-                  <span class="modal-subtask-text" [class.line-through]="s.done">{{ s.title }}</span>
-                  <button class="modal-subtask-remove" (click)="removeNewSubtask(s.id)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                </li>
-              }
-            </ul>
-          }
-          <div class="subtask-add-row">
-            <input
-              type="text"
-              class="modal-input subtask-input"
-              placeholder="Add a subtask and press Enter..."
-              [value]="newSubtaskText()"
-              (input)="newSubtaskText.set($any($event.target).value)"
-              (keydown)="onNewSubtaskKeydown($event)"
-            />
-            <button class="subtask-add-btn" (click)="addNewSubtask()" [disabled]="!newSubtaskText().trim()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeAddModal()">Cancel</button>
-          <button class="btn-primary" (click)="submitAddCard()" [disabled]="!newCard().title?.trim()">Add Card</button>
-        </div>
-      </div>
-    </div>
+  </div>
   }
 
-  <!-- ── Edit Card Modal ──────────────────────────────────── -->
-  @if (showEditModal()) {
-    <div class="modal-backdrop" (click)="closeEditModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Edit Card</h2>
-          <button class="modal-close" (click)="closeEditModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <label>Title <span class="required">*</span></label>
-          <input type="text" [value]="editCard().title ?? ''" (input)="updateEditCard({ title: $any($event.target).value })" class="modal-input" />
-
-          <label>Description</label>
-          <textarea [value]="editCard().description ?? ''" (input)="updateEditCard({ description: $any($event.target).value })" class="modal-textarea" rows="2"></textarea>
-
-          <label>Tag</label>
-          <input type="text" [value]="editCard().tag ?? ''" (input)="updateEditCard({ tag: $any($event.target).value })" class="modal-input" />
-
-          <label>Priority</label>
-          <div class="priority-select">
-            @for (p of ['low', 'medium', 'high']; track p) {
-              <button
-                class="priority-option"
-                [class]="'priority-option priority-option-' + p + (editCard().priority === p ? ' selected' : '')"
-                (click)="updateEditCard({ priority: $any(p) })"
-              >
-                <span class="priority-dot"></span>{{ p }}
-              </button>
-            }
-          </div>
-
-          <label>Subtasks</label>
-          @if (editCard().subtasks.length > 0) {
-            <ul class="modal-subtask-list">
-              @for (s of editCard().subtasks; track s.id) {
-                <li class="modal-subtask-item">
-                  <button class="modal-subtask-check" [class.checked]="s.done" (click)="toggleEditSubtask(s.id)">
-                    @if (s.done) {
-                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="2 6 5 9 10 3"/>
-                      </svg>
-                    }
-                  </button>
-                  <span class="modal-subtask-text" [class.line-through]="s.done">{{ s.title }}</span>
-                  <button class="modal-subtask-remove" (click)="removeEditSubtask(s.id)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                </li>
-              }
-            </ul>
-          }
-          <div class="subtask-add-row">
-            <input
-              type="text"
-              class="modal-input subtask-input"
-              placeholder="Add a subtask and press Enter..."
-              [value]="editSubtaskText()"
-              (input)="editSubtaskText.set($any($event.target).value)"
-              (keydown)="onEditSubtaskKeydown($event)"
-            />
-            <button class="subtask-add-btn" (click)="addEditSubtask()" [disabled]="!editSubtaskText().trim()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeEditModal()">Cancel</button>
-          <button class="btn-primary" (click)="submitEditCard()" [disabled]="!editCard().title?.trim()">Save Changes</button>
-        </div>
-      </div>
-    </div>
+  } @else {
+  <router-outlet></router-outlet>
   }
+</main>
 
-  <!-- ── Activity Panel ──────────────────────────────────── -->
-  <div class="activity-panel-overlay" [class.open]="showActivityPanel()" (click)="toggleActivityPanel()"></div>
-  <aside class="activity-panel" [class.open]="showActivityPanel()">
-    <div class="activity-header">
-      <h2>Activity Log</h2>
-      <button class="modal-close" (click)="toggleActivityPanel()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+<!-- ── Add Card Modal ──────────────────────────────────── -->
+@if (showAddModal()) {
+<div class="modal-backdrop" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Card</h2>
+      <button class="modal-close" (click)="closeAddModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
     </div>
-    <div class="activity-body">
-      @if (activityLogs().length === 0) {
-        <div class="empty-state">No activity yet.</div>
-      } @else {
-        <ul class="log-list">
-          @for (log of activityLogs(); track log.id) {
-            <li class="log-item">
-              <div class="log-avatar">{{ log.user_email[0] | uppercase }}</div>
-              <div class="log-content">
-                <p class="log-text">
-                  <strong>{{ log.user_email }}</strong> {{ log.action }}
-                </p>
-                <p class="log-details">{{ log.details }}</p>
-                <span class="log-time">{{ log.created_at | date:'short' }}</span>
-              </div>
-            </li>
+    <div class="modal-body">
+      <label>Title <span class="required">*</span></label>
+      <input type="text" placeholder="Card title..." [value]="newCard().title ?? ''"
+        (input)="updateNewCard({ title: $any($event.target).value })" class="modal-input" autofocus />
+
+      <label>Description</label>
+      <textarea placeholder="Add a brief description..." [value]="newCard().description ?? ''"
+        (input)="updateNewCard({ description: $any($event.target).value })" class="modal-textarea" rows="2"></textarea>
+
+      <label>Tag</label>
+      <input type="text" placeholder="e.g. Design, Backend, Bug..." [value]="newCard().tag ?? ''"
+        (input)="updateNewCard({ tag: $any($event.target).value })" class="modal-input" />
+
+      <label>Priority</label>
+      <div class="priority-select">
+        @for (p of ['low', 'medium', 'high']; track p) {
+        <button class="priority-option"
+          [class]="'priority-option priority-option-' + p + (newCard().priority === p ? ' selected' : '')"
+          (click)="updateNewCard({ priority: $any(p) })">
+          <span class="priority-dot"></span>{{ p }}
+        </button>
+        }
+      </div>
+
+      <label>Subtasks</label>
+      @if (newCard().subtasks.length > 0) {
+      <ul class="modal-subtask-list">
+        @for (s of newCard().subtasks; track s.id) {
+        <li class="modal-subtask-item">
+          <button class="modal-subtask-check" [class.checked]="s.done" (click)="s.done = !s.done">
+            @if (s.done) {
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 6 5 9 10 3" />
+            </svg>
+            }
+          </button>
+          <span class="modal-subtask-text" [class.line-through]="s.done">{{ s.title }}</span>
+          <button class="modal-subtask-remove" (click)="removeNewSubtask(s.id)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </li>
+        }
+      </ul>
+      }
+      <div class="subtask-add-row">
+        <input type="text" class="modal-input subtask-input" placeholder="Add a subtask and press Enter..."
+          [value]="newSubtaskText()" (input)="newSubtaskText.set($any($event.target).value)"
+          (keydown)="onNewSubtaskKeydown($event)" />
+        <button class="subtask-add-btn" (click)="addNewSubtask()" [disabled]="!newSubtaskText().trim()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeAddModal()">Cancel</button>
+      <button class="btn-primary" (click)="submitAddCard()" [disabled]="!newCard().title?.trim()">Add Card</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ── Edit Card Modal ──────────────────────────────────── -->
+@if (showEditModal()) {
+<div class="modal-backdrop" (click)="closeEditModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Card</h2>
+      <button class="modal-close" (click)="closeEditModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label>Title <span class="required">*</span></label>
+      <input type="text" [value]="editCard().title ?? ''" (input)="updateEditCard({ title: $any($event.target).value })"
+        class="modal-input" />
+
+      <label>Description</label>
+      <textarea [value]="editCard().description ?? ''"
+        (input)="updateEditCard({ description: $any($event.target).value })" class="modal-textarea" rows="2"></textarea>
+
+      <label>Tag</label>
+      <input type="text" [value]="editCard().tag ?? ''" (input)="updateEditCard({ tag: $any($event.target).value })"
+        class="modal-input" />
+
+      <label>Priority</label>
+      <div class="priority-select">
+        @for (p of ['low', 'medium', 'high']; track p) {
+        <button class="priority-option"
+          [class]="'priority-option priority-option-' + p + (editCard().priority === p ? ' selected' : '')"
+          (click)="updateEditCard({ priority: $any(p) })">
+          <span class="priority-dot"></span>{{ p }}
+        </button>
+        }
+      </div>
+
+      <label>Subtasks</label>
+      @if (editCard().subtasks.length > 0) {
+      <ul class="modal-subtask-list">
+        @for (s of editCard().subtasks; track s.id) {
+        <li class="modal-subtask-item">
+          <button class="modal-subtask-check" [class.checked]="s.done" (click)="toggleEditSubtask(s.id)">
+            @if (s.done) {
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 6 5 9 10 3" />
+            </svg>
+            }
+          </button>
+          <span class="modal-subtask-text" [class.line-through]="s.done">{{ s.title }}</span>
+          <button class="modal-subtask-remove" (click)="removeEditSubtask(s.id)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </li>
+        }
+      </ul>
+      }
+      <div class="subtask-add-row">
+        <input type="text" class="modal-input subtask-input" placeholder="Add a subtask and press Enter..."
+          [value]="editSubtaskText()" (input)="editSubtaskText.set($any($event.target).value)"
+          (keydown)="onEditSubtaskKeydown($event)" />
+        <button class="subtask-add-btn" (click)="addEditSubtask()" [disabled]="!editSubtaskText().trim()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditModal()">Cancel</button>
+      <button class="btn-primary" (click)="submitEditCard()" [disabled]="!editCard().title?.trim()">Save
+        Changes</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ── Activity Panel ──────────────────────────────────── -->
+<div class="activity-panel-overlay" [class.open]="showActivityPanel()" (click)="toggleActivityPanel()"></div>
+<aside class="activity-panel" [class.open]="showActivityPanel()">
+  <div class="activity-header">
+    <h2>Activity Log</h2>
+    <button class="modal-close" (click)="toggleActivityPanel()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
+  <div class="activity-body">
+    @if (activityLogs().length === 0) {
+    <div class="empty-state">No activity yet.</div>
+    } @else {
+    <ul class="log-list">
+      @for (log of activityLogs(); track log.id) {
+      <li class="log-item">
+        <div class="log-avatar">{{ log.user_email[0] | uppercase }}</div>
+        <div class="log-content">
+          <p class="log-text">
+            <strong>{{ log.user_email }}</strong> {{ log.action }}
+          </p>
+          <p class="log-details">{{ log.details }}</p>
+          <span class="log-time">{{ log.created_at | date:'short' }}</span>
+        </div>
+      </li>
+      }
+    </ul>
+    }
+  </div>
+</aside>
+
+<!-- ── Invite/Members Modal ──────────────────────────────────── -->
+@if (showInviteModal()) {
+<div class="modal-backdrop" (click)="closeInviteModal()">
+  <div class="modal members-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Board Members</h2>
+      <button class="modal-close" (click)="closeInviteModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label>Invite new member</label>
+      <div class="invite-row">
+        <input type="email" placeholder="user@example.com" [value]="inviteEmail()"
+          (input)="inviteEmail.set($any($event.target).value)" class="modal-input" (keydown.enter)="submitInvite()" />
+        <button class="btn-primary" (click)="submitInvite()" [disabled]="inviteLoading() || !inviteEmail()">
+          @if (inviteLoading()) {
+          <span class="auth-spinner"></span>
+          } @else {
+          Invite
           }
-        </ul>
+        </button>
+      </div>
+      @if (inviteError()) {
+      <p class="invite-error">{{ inviteError() }}</p>
+      }
+
+      <h3 class="members-title">Current Members</h3>
+      <ul class="members-list">
+        @for (member of boardMembers(); track member.user_id) {
+        <li class="member-item">
+          <div class="member-info">
+            <div class="member-avatar">{{ member.user_email[0] | uppercase }}</div>
+            <div>
+              <span class="member-email">{{ member.user_email }}</span>
+              @if (member.role === 'owner') {
+              <span class="badge owner">Owner</span>
+              }
+            </div>
+          </div>
+          @if (member.role !== 'owner') {
+          <button class="member-remove" (click)="removeMember(member.user_id)" title="Remove member">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          }
+        </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ── Create Board Modal ──────────────────────────────────── -->
+@if (showCreateBoardModal()) {
+<div class="modal-backdrop" (click)="closeCreateBoardModal()">
+  <div class="modal create-board-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Board</h2>
+      <button class="modal-close" (click)="closeCreateBoardModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label>Board Title <span class="required">*</span></label>
+      <input type="text" placeholder="e.g. Project Roadmap, Vacation Planning..." [value]="newBoardTitle()"
+        (input)="newBoardTitle.set($any($event.target).value)" class="modal-input" autofocus
+        (keydown.enter)="submitCreateBoard()" />
+
+      <label>Description (Optional)</label>
+      <textarea placeholder="What is this board about?" [value]="newBoardDescription()"
+        (input)="newBoardDescription.set($any($event.target).value)" class="modal-textarea" rows="3"></textarea>
+
+      <label>Board Color</label>
+      <div class="color-picker" style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+        @for (color of boardColorOptions; track color) {
+        <div class="color-option" [style.backgroundColor]="color" [class.selected]="selectedBoardColor() === color"
+          (click)="selectedBoardColor.set(color)" [title]="color"
+          style="width: 34px; height: 34px; min-width: 34px; min-height: 34px;">
+          @if (selectedBoardColor() === color) {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round" style="color: rgba(0,0,0,0.5)">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          }
+        </div>
+        }
+      </div>
+
+      @if (createBoardError()) {
+      <p class="invite-error">{{ createBoardError() }}</p>
       }
     </div>
-  </aside>
-
-  <!-- ── Invite/Members Modal ──────────────────────────────────── -->
-  @if (showInviteModal()) {
-    <div class="modal-backdrop" (click)="closeInviteModal()">
-      <div class="modal members-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Board Members</h2>
-          <button class="modal-close" (click)="closeInviteModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <label>Invite new member</label>
-          <div class="invite-row">
-            <input
-              type="email"
-              placeholder="user@example.com"
-              [value]="inviteEmail()"
-              (input)="inviteEmail.set($any($event.target).value)"
-              class="modal-input"
-              (keydown.enter)="submitInvite()"
-            />
-            <button class="btn-primary" (click)="submitInvite()" [disabled]="inviteLoading() || !inviteEmail()">
-              @if (inviteLoading()) {
-                <span class="auth-spinner"></span>
-              } @else {
-                Invite
-              }
-            </button>
-          </div>
-          @if (inviteError()) {
-            <p class="invite-error">{{ inviteError() }}</p>
-          }
-
-          <h3 class="members-title">Current Members</h3>
-          <ul class="members-list">
-            @for (member of boardMembers(); track member.user_id) {
-              <li class="member-item">
-                <div class="member-info">
-                  <div class="member-avatar">{{ member.user_email[0] | uppercase }}</div>
-                  <div>
-                    <span class="member-email">{{ member.user_email }}</span>
-                    @if (member.role === 'owner') {
-                      <span class="badge owner">Owner</span>
-                    }
-                  </div>
-                </div>
-                @if (member.role !== 'owner') {
-                  <button class="member-remove" (click)="removeMember(member.user_id)" title="Remove member">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                }
-              </li>
-            }
-          </ul>
-        </div>
-      </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCreateBoardModal()">Cancel</button>
+      <button class="btn-primary" (click)="submitCreateBoard()"
+        [disabled]="createBoardLoading() || !newBoardTitle().trim()">
+        @if (createBoardLoading()) {
+        <span class="auth-spinner"></span>
+        } @else {
+        Create Board
+        }
+      </button>
     </div>
-  }
+  </div>
+</div>
+}
 
-  <!-- ── Create Board Modal ──────────────────────────────────── -->
-  @if (showCreateBoardModal()) {
-    <div class="modal-backdrop" (click)="closeCreateBoardModal()">
-      <div class="modal create-board-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Create New Board</h2>
-          <button class="modal-close" (click)="closeCreateBoardModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <label>Board Title <span class="required">*</span></label>
-          <input 
-            type="text" 
-            placeholder="e.g. Project Roadmap, Vacation Planning..." 
-            [value]="newBoardTitle()" 
-            (input)="newBoardTitle.set($any($event.target).value)" 
-            class="modal-input" 
-            autofocus 
-            (keydown.enter)="submitCreateBoard()"
-          />
+<!-- ── Edit Board Modal ──────────────────────────────────── -->
+@if (showEditBoardModal()) {
+<div class="modal-backdrop" (click)="closeEditBoardModal()">
+  <div class="modal create-board-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Board</h2>
+      <button class="modal-close" (click)="closeEditBoardModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label>Board Title <span class="required">*</span></label>
+      <input type="text" placeholder="e.g. Project Roadmap..." [value]="editBoardTitle()"
+        (input)="editBoardTitle.set($any($event.target).value)" class="modal-input" autofocus
+        (keydown.enter)="submitEditBoard()" />
 
-          <label>Description (Optional)</label>
-          <textarea 
-            placeholder="What is this board about?" 
-            [value]="newBoardDescription()" 
-            (input)="newBoardDescription.set($any($event.target).value)" 
-            class="modal-textarea"
-            rows="3"
-          ></textarea>
+      <label>Description (Optional)</label>
+      <textarea placeholder="What is this board about?" [value]="editBoardDescription()"
+        (input)="editBoardDescription.set($any($event.target).value)" class="modal-textarea" rows="3"></textarea>
 
-          <label>Board Color</label>
-          <div class="color-picker" style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
-            @for (color of boardColorOptions; track color) {
-              <div 
-                class="color-option" 
-                [style.backgroundColor]="color" 
-                [class.selected]="selectedBoardColor() === color"
-                (click)="selectedBoardColor.set(color)"
-                [title]="color"
-                style="width: 34px; height: 34px; min-width: 34px; min-height: 34px;"
-              >
-                @if (selectedBoardColor() === color) {
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: rgba(0,0,0,0.5)">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                }
-              </div>
-            }
-          </div>
-
-          @if (createBoardError()) {
-            <p class="invite-error">{{ createBoardError() }}</p>
+      <label>Board Color</label>
+      <div class="color-picker" style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+        @for (color of boardColorOptions; track color) {
+        <div class="color-option" [style.backgroundColor]="color" [class.selected]="editBoardColor() === color"
+          (click)="editBoardColor.set(color)" [title]="color"
+          style="width: 34px; height: 34px; min-width: 34px; min-height: 34px;">
+          @if (editBoardColor() === color) {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round" style="color: rgba(0,0,0,0.5)">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
           }
         </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeCreateBoardModal()">Cancel</button>
-          <button 
-            class="btn-primary" 
-            (click)="submitCreateBoard()" 
-            [disabled]="createBoardLoading() || !newBoardTitle().trim()"
-          >
-            @if (createBoardLoading()) {
-              <span class="auth-spinner"></span>
-            } @else {
-              Create Board
-            }
-          </button>
-        </div>
+        }
       </div>
+
+      @if (editBoardError()) {
+      <p class="invite-error">{{ editBoardError() }}</p>
+      }
     </div>
-  }
-
-  <!-- ── Edit Board Modal ──────────────────────────────────── -->
-  @if (showEditBoardModal()) {
-    <div class="modal-backdrop" (click)="closeEditBoardModal()">
-      <div class="modal create-board-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Edit Board</h2>
-          <button class="modal-close" (click)="closeEditBoardModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <label>Board Title <span class="required">*</span></label>
-          <input 
-            type="text" 
-            placeholder="e.g. Project Roadmap..." 
-            [value]="editBoardTitle()" 
-            (input)="editBoardTitle.set($any($event.target).value)" 
-            class="modal-input" 
-            autofocus 
-            (keydown.enter)="submitEditBoard()"
-          />
-
-          <label>Description (Optional)</label>
-          <textarea 
-            placeholder="What is this board about?" 
-            [value]="editBoardDescription()" 
-            (input)="editBoardDescription.set($any($event.target).value)" 
-            class="modal-textarea"
-            rows="3"
-          ></textarea>
-
-          <label>Board Color</label>
-          <div class="color-picker" style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
-            @for (color of boardColorOptions; track color) {
-              <div 
-                class="color-option" 
-                [style.backgroundColor]="color" 
-                [class.selected]="editBoardColor() === color"
-                (click)="editBoardColor.set(color)"
-                [title]="color"
-                style="width: 34px; height: 34px; min-width: 34px; min-height: 34px;"
-              >
-                @if (editBoardColor() === color) {
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: rgba(0,0,0,0.5)">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                }
-              </div>
-            }
-          </div>
-
-          @if (editBoardError()) {
-            <p class="invite-error">{{ editBoardError() }}</p>
-          }
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeEditBoardModal()">Cancel</button>
-          <button 
-            class="btn-primary" 
-            (click)="submitEditBoard()" 
-            [disabled]="editBoardLoading() || !editBoardTitle().trim()"
-          >
-            @if (editBoardLoading()) {
-              <span class="auth-spinner"></span>
-            } @else {
-              Save Changes
-            }
-          </button>
-        </div>
-      </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditBoardModal()">Cancel</button>
+      <button class="btn-primary" (click)="submitEditBoard()"
+        [disabled]="editBoardLoading() || !editBoardTitle().trim()">
+        @if (editBoardLoading()) {
+        <span class="auth-spinner"></span>
+        } @else {
+        Save Changes
+        }
+      </button>
     </div>
-  }
+  </div>
+</div>
+}
 
-  <!-- ── Delete Board Confirmation Modal ────────────────────── -->
-  @if (showDeleteBoardModal()) {
-    <div class="modal-backdrop" (click)="closeDeleteBoardModal()">
-      <div class="modal delete-confirm-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Delete Board</h2>
-          <button class="modal-close" (click)="closeDeleteBoardModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this board? This action cannot be undone.</p>
-          @if (deleteBoardError()) {
-            <p class="invite-error" style="margin-top: 12px;">{{ deleteBoardError() }}</p>
-          }
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeDeleteBoardModal()">Cancel</button>
-          <button 
-            class="btn-primary danger-btn" 
-            (click)="submitDeleteBoard()" 
-            [disabled]="deleteBoardLoading()"
-          >
-            @if (deleteBoardLoading()) {
-              <span class="auth-spinner"></span>
-            } @else {
-              Yes, delete board
-            }
-          </button>
-        </div>
-      </div>
+<!-- ── Delete Board Confirmation Modal ────────────────────── -->
+@if (showDeleteBoardModal()) {
+<div class="modal-backdrop" (click)="closeDeleteBoardModal()">
+  <div class="modal delete-confirm-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Delete Board</h2>
+      <button class="modal-close" (click)="closeDeleteBoardModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
     </div>
-  }
+    <div class="modal-body">
+      <p>Are you sure you want to delete this board? This action cannot be undone.</p>
+      @if (deleteBoardError()) {
+      <p class="invite-error" style="margin-top: 12px;">{{ deleteBoardError() }}</p>
+      }
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteBoardModal()">Cancel</button>
+      <button class="btn-primary danger-btn" (click)="submitDeleteBoard()" [disabled]="deleteBoardLoading()">
+        @if (deleteBoardLoading()) {
+        <span class="auth-spinner"></span>
+        } @else {
+        Yes, delete board
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
 }
 
 <!-- Global click listener to close menus -->
 @if (openBoardMenuId()) {
-  <div class="global-menu-backdrop" (click)="closeBoardMenu()"></div>
+<div class="global-menu-backdrop" (click)="closeBoardMenu()"></div>
 }

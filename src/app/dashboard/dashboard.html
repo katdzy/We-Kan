@@ -1,7 +1,15 @@
 <div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>Welcome, {{ userName }}</h1>
-    <p>Organize your tasks, track your progress, and turn your plans into completed goals.</p>
+  <div class="dashboard-header-neo">
+    <img src="/hexagram-1.png" class="hexagram-1" alt="" />
+    <img src="/hexagram-2.png" class="hexagram-2" alt="" />
+    <h1 class="welcome-header">
+      <span class="welcome-text">Welcome, </span>
+      <span class="username-text">
+        {{ userName }}
+        <img src="/arrow.png" class="welcome-arrow" alt="" />
+      </span>
+    </h1>
+    <p class="dashboard-desc">Organize your tasks, track your progress, and turn your plans into completed goals.</p>
   </div>
 
   <div class="dashboard-widgets">
@@ -9,27 +17,39 @@
       <h3>Recent Boards</h3>
       <div class="boards-list">
         @if (loading()) {
-          <div class="loading">Loading boards...</div>
+        <div class="loading">Loading boards...</div>
         } @else if (error()) {
-          <div class="error">{{ error() }}</div>
+        <div class="error">{{ error() }}</div>
         } @else if (recentBoards().length === 0) {
-          <div class="no-boards">No boards found.</div>
+        <div class="no-boards">No boards found.</div>
         } @else {
-          @for (board of recentBoards(); track board.id) {
-            <div class="board-card card-glass" (click)="navigateToBoard(board.id)">
-              <div class="board-color-thumb" [style.backgroundColor]="board.color || '#BDF522'"></div>
-              <div class="board-info">
-                <h4>{{ board.title }}</h4>
-                <div class="progress-container">
-                  <div class="progress-bar" [style.width.%]="board.progress"></div>
+        @for (board of recentBoards(); track board.id) {
+        <div class="board-card-neo" (click)="navigateToBoard(board.id)">
+          <div class="board-card-top" [style.backgroundColor]="board.color || '#F97316'">
+            <h4 class="board-title-neo">{{ board.title }}</h4>
+          </div>
+          <div class="board-card-bottom">
+            <div class="progress-row-neo">
+              <div class="progress-col-neo">
+                <span class="progress-label-neo">Progress Summary</span>
+                <div class="progress-container-neo">
+                  <div class="progress-bar-neo" [style.width.%]="board.progress"
+                    [style.backgroundColor]="board.color || '#F97316'"></div>
                 </div>
-                <span class="progress-text">{{ board.progress }}% Complete</span>
               </div>
+              <span class="progress-percent-neo" [style.color]="board.color || '#F97316'">{{ board.progress }}%</span>
             </div>
-          }
+            <div class="view-btn-container">
+              <button class="view-board-btn-neo" [style.backgroundColor]="board.color || '#F97316'">View</button>
+            </div>
+          </div>
+        </div>
+        }
         }
       </div>
-      <button class="view-all-btn" [routerLink]="['/boards']">View all boards</button>
+      <div class="view-all-container">
+        <button class="view-all-btn-neo" [routerLink]="['/boards']">View All Boards</button>
+      </div>
     </div>
   </div>
 </div>
