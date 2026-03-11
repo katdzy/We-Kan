@@ -263,6 +263,7 @@
       <div class="board-neo-card">
         <!-- Card Preview Top -->
         <div class="bnc-preview" [style.background]="board.color || '#BDF522'">
+          <h3 class="bnc-preview-title">{{ board.title }}</h3>
           @if (isOwnerOfBoard(board)) {
           <div class="bnc-menu-wrap" (click)="$event.stopPropagation()">
             <button class="bnc-dots-btn" (click)="toggleBoardMenu($event, board.id)" title="Board options">
@@ -285,7 +286,6 @@
 
         <!-- Card Bottom -->
         <div class="bnc-info">
-          <h3 class="bnc-title">{{ board.title }}</h3>
           <div class="bnc-progress-row">
             <div class="bnc-progress-left">
               <span class="bnc-progress-label">Progress Summary</span>
