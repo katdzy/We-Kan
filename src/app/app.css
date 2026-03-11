@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
-  background: #F5F5F0;
+  background: #FFFFFF;
   border-bottom: 3px solid #000000;
   height: 72px;
 }
@@ -102,6 +102,7 @@ a.user-email-neo:hover {
 .app-title {
   font-family: 'Anton', sans-serif;
   font-size: 16px;
+  font-weight: normal;
   color: #000000;
   letter-spacing: 0.05em;
 }
@@ -118,14 +119,15 @@ a.user-email-neo:hover {
 .app-navbar {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 20px;
   background: transparent;
   padding: 4px;
 }
 
 .nav-link {
-  font-family: 'Anton', sans-serif;
-  font-size: 17px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
   letter-spacing: 0.05em;
   color: #000000;
   background: transparent;
@@ -147,8 +149,9 @@ a.user-email-neo:hover {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Anton', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 16px;
+  font-weight: 700;
   letter-spacing: 0.04em;
   color: #000000;
   background: transparent;
@@ -1651,11 +1654,11 @@ a.user-email-neo:hover {
   font-family: 'Anton', sans-serif;
   font-size: 3rem;
   color: #BDF522;
-  -webkit-text-stroke: 1.5px #000000;
+  -webkit-text-stroke: 1px #000000;
   text-shadow: 3px 3px 0px #000000;
   margin: 0 0 12px 0;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
 .boards-page-subtitle {
@@ -1740,6 +1743,8 @@ a.user-email-neo:hover {
   flex-direction: column;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   overflow: visible;
+  position: relative;
+  z-index: 51;
 }
 
 .board-neo-card:hover {
@@ -1751,10 +1756,30 @@ a.user-email-neo:hover {
 .bnc-preview {
   position: relative;
   border-bottom: 2px solid #000000;
-  padding: 10px 10px 0;
+  padding: 10px;
   min-height: 210px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Title shown centered in the colored preview area */
+.bnc-preview-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.4rem;
+  color: #ffffff;
+  -webkit-text-stroke: 0.3px #000000;
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bnc-browser-bar {
@@ -1793,22 +1818,37 @@ a.user-email-neo:hover {
 }
 
 .bnc-dots-btn {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1.5px solid rgba(0, 0, 0, 0.25);
-  border-radius: 4px;
-  width: 26px;
-  height: 26px;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 50px;
+  box-shadow: 2px 2px 0px #000000;
+  width: 28px;
+  height: 52px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #000000;
-  transition: background 0.15s;
-  padding: 0;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  padding: 6px 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.bnc-dots-btn svg {
+  width: 7px;
+  height: 100%;
+  display: block;
 }
 
 .bnc-dots-btn:hover {
-  background: #ffffff;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.bnc-dots-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0px #000000;
 }
 
 .bnc-dropdown {
@@ -1897,16 +1937,21 @@ a.user-email-neo:hover {
 }
 
 .bnc-progress-track {
-  height: 8px;
-  background: #eeeeee;
-  border: 1.5px solid #000000;
+  height: 10px;
+  background: #000000;
+  border-radius: 50px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  box-sizing: border-box;
 }
 
 .bnc-progress-fill {
-  height: 100%;
-  border-right: 1.5px solid #000000;
+  height: 6px;
+  border-radius: 50px;
   transition: width 0.3s ease;
+  flex-shrink: 0;
 }
 
 .bnc-percent {
@@ -2123,7 +2168,7 @@ a.user-email-neo:hover {
 .global-menu-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 50;
   /* invisible but captures clicks to close dropdown */
 }
 
