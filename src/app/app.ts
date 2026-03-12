@@ -6,6 +6,23 @@ import { RouterLink, RouterOutlet, Router, RouterLinkActive, ActivatedRoute } fr
 import { SupabaseService, ActivityLog, BoardMember } from './supabase.service';
 import { AuthService } from './auth.service';
 
+export type ThemeKey = 'default' | 'noir' | 'mon-cheri' | 'cotton-candy' | 'starry-night';
+
+export interface ThemeOption {
+  key: ThemeKey;
+  name: string;
+  swatchBg: string;
+  swatchAccent: string;
+}
+
+const THEMES: ThemeOption[] = [
+  { key: 'default', name: 'Default', swatchBg: '#ffffff', swatchAccent: '#BDF522' },
+  { key: 'noir', name: 'Noir', swatchBg: '#000000', swatchAccent: '#ffffff' },
+  { key: 'mon-cheri', name: 'Mon Cheri', swatchBg: '#6b0f1a', swatchAccent: '#fdf6ee' },
+  { key: 'cotton-candy', name: 'Cotton Candy', swatchBg: '#e91e8c', swatchAccent: '#80deea' },
+  { key: 'starry-night', name: 'Starry Night', swatchBg: '#1a237e', swatchAccent: '#ffd600' },
+];
+
 export interface Subtask {
   id: string;
   title: string;
@@ -64,7 +81,7 @@ export class App implements OnInit, OnDestroy {
   inviteEmail = signal('');
   inviteError = signal<string | null>(null);
   inviteLoading = signal(false);
-  
+
   // ── Create board modal ───────────────────────────────────────────────────────────
   showCreateBoardModal = signal(false);
   newBoardTitle = signal('');
@@ -91,6 +108,12 @@ export class App implements OnInit, OnDestroy {
 
   // ── Board context menu ───────────────────────────────────────────────────────────
   openBoardMenuId = signal<string | null>(null);
+
+  // ── Theme ────────────────────────────────────────────────────────────────────────
+  readonly themeOptions = THEMES;
+  activeTheme = signal<ThemeKey>(
+    (localStorage.getItem('we-kan-theme') as ThemeKey) ?? 'default'
+  );
 
   // ── Auth UI state ─────────────────────────────────────────────────────────
   authMode = signal<'login' | 'signup'>('login');
@@ -129,10 +152,10 @@ export class App implements OnInit, OnDestroy {
 
     for (const col of this.columns()) {
       const isDoneColumn = col.title.toLowerCase() === doneColumnTitle.toLowerCase();
-      
+
       for (const card of col.cards) {
         totalCards++;
-        
+
         if (card.subtasks && card.subtasks.length > 0) {
           const allSubtasksDone = card.subtasks.every(st => st.done);
           if (isDoneColumn && allSubtasksDone) {
@@ -145,11 +168,13 @@ export class App implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return totalCards === 0 ? 0 : Math.round((completedCards / totalCards) * 100);
   });
 
   constructor() {
+    // Apply saved theme on boot
+    this.applyTheme(this.activeTheme());
     // When session changes (login / logout), fetch boards list; clear on logout
     effect(() => {
       const session = this.authService.session();
@@ -330,7 +355,7 @@ export class App implements OnInit, OnDestroy {
     this.router.navigate(['/boards'], { replaceUrl: true });
   }
 
-   openCreateBoardModal() {
+  openCreateBoardModal() {
     this.newBoardTitle.set('');
     this.newBoardDescription.set('');
     this.selectedBoardColor.set('#BDF522');
@@ -411,12 +436,12 @@ export class App implements OnInit, OnDestroy {
       const description = this.editBoardDescription().trim();
       const color = this.editBoardColor();
       await this.supabase.updateBoard(boardId, title, description, color);
-      
+
       // Update local lists
-      this.accessibleBoards.update(boards => 
+      this.accessibleBoards.update(boards =>
         boards.map(b => b.id === boardId ? { ...b, title, description, color } : b)
       );
-      
+
       // If editing the active board, update that too
       const active = this.activeBoard();
       if (active && active.id === boardId) {
@@ -452,12 +477,12 @@ export class App implements OnInit, OnDestroy {
     this.deleteBoardError.set(null);
     try {
       await this.supabase.deleteBoard(boardId);
-      
+
       // Remove from list
       this.accessibleBoards.update(boards => boards.filter(b => b.id !== boardId));
-      
+
       this.closeDeleteBoardModal();
-      
+
       // If we just deleted the active board, we must go back to list
       if (this.activeBoard()?.id === boardId) {
         this.goBackToList();
@@ -822,4 +847,16 @@ export class App implements OnInit, OnDestroy {
   trackColumn(_: number, col: Column) { return col.id; }
   trackCard(_: number, card: Card) { return card.id; }
   trackSubtask(_: number, s: Subtask) { return s.id; }
+
+  selectTheme(key: ThemeKey) {
+    this.activeTheme.set(key);
+    localStorage.setItem('we-kan-theme', key);
+    this.applyTheme(key);
+  }
+
+  private applyTheme(key: ThemeKey) {
+    const cl = document.body.classList;
+    cl.remove('theme-noir', 'theme-mon-cheri', 'theme-cotton-candy', 'theme-starry-night');
+    if (key !== 'default') cl.add(`theme-${key}`);
+  }
 }
