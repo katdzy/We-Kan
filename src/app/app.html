@@ -262,7 +262,7 @@
     } @else {
     <div class="boards-cards-grid">
       @for (board of accessibleBoards(); track board.id) {
-      <div class="board-neo-card">
+      <div class="board-neo-card" [class.menu-open]="openBoardMenuId() === board.id">
         <!-- Card Preview Top -->
         <div class="bnc-preview" [style.background]="board.color || '#BDF522'">
           <h3 class="bnc-preview-title">{{ board.title }}</h3>
@@ -279,7 +279,7 @@
               </svg>
             </button>
             @if (openBoardMenuId() === board.id) {
-            <div class="board-dropdown-menu list-card-dropdown">
+            <div class="bnc-dropdown">
               <button class="dropdown-item" (click)="openEditBoardModal($event, board)">Edit Board</button>
               <button class="dropdown-item danger" (click)="openDeleteBoardModal($event, board.id)">Delete
                 Board</button>
@@ -314,7 +314,7 @@
   </div>
   }
 
-  <!-- ── Kanban Board View ── -->
+  <!-- ── We-KanBoard View ── -->
   @if (viewMode() === 'board') {
   <div class="board-info-banner">
     <div class="board-type-tag" [class.group-board]="(activeBoard()?.member_count ?? 1) > 1">
@@ -755,6 +755,8 @@
 </div>
 }
 
+}
+
 <!-- ── Create Board Modal ──────────────────────────────────── -->
 @if (showCreateBoardModal()) {
 <div class="modal-backdrop neo-backdrop" (click)="closeCreateBoardModal()">
@@ -862,6 +864,7 @@
         }
       </div>
 
+
       @if (editBoardError()) {
       <p class="invite-error">{{ editBoardError() }}</p>
       }
@@ -883,27 +886,34 @@
 
 <!-- ── Delete Board Confirmation Modal ────────────────────── -->
 @if (showDeleteBoardModal()) {
-<div class="modal-backdrop" (click)="closeDeleteBoardModal()">
+<div class="modal-backdrop neo-backdrop" (click)="closeDeleteBoardModal()">
   <div class="modal delete-confirm-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Delete Board</h2>
-      <button class="modal-close" (click)="closeDeleteBoardModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round">
+    <div class="neo-modal-header">
+      <div class="neo-window-controls">
+        <span class="neo-dot" style="background-color: #FE8616;"></span>
+        <span class="neo-dot" style="background-color: #FA51A2;"></span>
+        <span class="neo-dot" style="background-color: #BDF522;"></span>
+      </div>
+      <h2 class="neo-window-title">Delete Board</h2>
+      <button class="neo-close-btn" (click)="closeDeleteBoardModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+          stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
     </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete this board? This action cannot be undone.</p>
+    <div class="neo-modal-body">
+      <p style="font-family: 'DM Sans', sans-serif; font-size: 1rem; color: #000000; line-height: 1.5;">
+        Are you sure you want to delete this board? This action cannot be undone.
+      </p>
       @if (deleteBoardError()) {
       <p class="invite-error" style="margin-top: 12px;">{{ deleteBoardError() }}</p>
       }
     </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeDeleteBoardModal()">Cancel</button>
-      <button class="btn-primary danger-btn" (click)="submitDeleteBoard()" [disabled]="deleteBoardLoading()">
+    <div class="neo-modal-footer">
+      <button class="neo-btn-cancel" (click)="closeDeleteBoardModal()">Cancel</button>
+      <button class="neo-btn-create danger-btn" (click)="submitDeleteBoard()" [disabled]="deleteBoardLoading()">
         @if (deleteBoardLoading()) {
         <span class="auth-spinner"></span>
         } @else {
@@ -914,7 +924,7 @@
   </div>
 </div>
 }
-}
+
 
 <!-- Global click listener to close menus -->
 @if (openBoardMenuId()) {

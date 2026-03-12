@@ -314,7 +314,7 @@ export class SupabaseService {
 
     const { data: boardsData, error: fetchErr } = await this.supabase
       .from('boards')
-      .select('id, title, owner_id, color, board_members(count)')
+      .select('id, title, description, owner_id, color, board_members(count)')
       .order('created_at', { ascending: true });
 
     if (fetchErr) throw fetchErr;
