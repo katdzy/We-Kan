@@ -3255,7 +3255,7 @@ body.theme-noir .header-icon-btn:hover {
 
 body.theme-noir {
   background-color: #000000 !important;
-  background-image: url('/bg/Noir.jpg') !important;
+  background-image: url('/bg/noir.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
@@ -3789,7 +3789,7 @@ body.theme-mon-cheri .board-neo-card {
 
 body.theme-mon-cheri {
   background-color: #1a0505 !important;
-  background-image: url('/bg/Mon Cheri.png') !important;
+  background-image: url('/bg/mon-cheri.png') !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
@@ -4137,7 +4137,7 @@ body.theme-cotton-candy .board-card-neo {
 
 body.theme-cotton-candy {
   background-color: #fce4ec !important;
-  background-image: url('/bg/Cotton Candy.jpeg') !important;
+  background-image: url('/bg/cotton-candy.jpeg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
@@ -4440,7 +4440,7 @@ body.theme-starry-night .board-title-neo {
 
 body.theme-starry-night {
   background-color: #0d1b4b !important;
-  background-image: url('/bg/Starry Night.jpg') !important;
+  background-image: url('/bg/starry-night.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;

@@ -111,9 +111,8 @@ export class App implements OnInit, OnDestroy {
 
   // ── Theme ────────────────────────────────────────────────────────────────────────
   readonly themeOptions = THEMES;
-  activeTheme = signal<ThemeKey>(
-    (localStorage.getItem('we-kan-theme') as ThemeKey) ?? 'default'
-  );
+  activeTheme = signal<ThemeKey>('default');
+  showThemePicker = signal(false);
 
   // ── Auth UI state ─────────────────────────────────────────────────────────
   authMode = signal<'login' | 'signup'>('login');
@@ -173,8 +172,13 @@ export class App implements OnInit, OnDestroy {
   });
 
   constructor() {
-    // Apply saved theme on boot
-    this.applyTheme(this.activeTheme());
+    // Sync theme with Supabase
+    effect(() => {
+      const saved = this.authService.savedTheme();
+      this.activeTheme.set(saved);
+      this.applyTheme(saved);
+    });
+
     // When session changes (login / logout), fetch boards list; clear on logout
     effect(() => {
       const session = this.authService.session();
@@ -848,10 +852,18 @@ export class App implements OnInit, OnDestroy {
   trackCard(_: number, card: Card) { return card.id; }
   trackSubtask(_: number, s: Subtask) { return s.id; }
 
-  selectTheme(key: ThemeKey) {
+  async selectTheme(key: ThemeKey) {
     this.activeTheme.set(key);
-    localStorage.setItem('we-kan-theme', key);
     this.applyTheme(key);
+    
+    // Save to Supabase (only if signed in)
+    if (this.authService.session()) {
+      try {
+        await this.authService.updateTheme(key);
+      } catch (err) {
+        console.error('Failed to save theme', err);
+      }
+    }
   }
 
   private applyTheme(key: ThemeKey) {

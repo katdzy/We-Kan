@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { createClient, SupabaseClient, Session, User } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
+import { ThemeKey } from './app';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -9,6 +10,14 @@ export class AuthService {
   session = signal<Session | null>(null);
   user = computed<User | null>(() => this.session()?.user ?? null);
   username = computed<string | null>(() => this.user()?.user_metadata?.['display_name'] ?? null);
+
+  /** Public URL of the user's avatar from Supabase Storage, or null. */
+  avatarUrl = computed<string | null>(() => this.user()?.user_metadata?.['avatar_url'] ?? null);
+
+  /** The user's saved theme preference, or 'default'. */
+  savedTheme = computed<ThemeKey>(() =>
+    (this.user()?.user_metadata?.['theme'] as ThemeKey) ?? 'default'
+  );
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
@@ -56,42 +65,54 @@ export class AuthService {
     if (error) throw error;
   }
 
-  async updateAvatar(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const base64 = reader.result as string;
-          const { error } = await this.supabase.auth.updateUser({
-            data: { avatar_url: base64 }
-          });
-          if (error) throw error;
-          resolve(base64);
-        } catch (err) {
-          reject(err);
-        }
-      };
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsDataURL(file);
+  /** Saves the selected theme to Supabase user_metadata so it syncs across devices. */
+  async updateTheme(theme: ThemeKey): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({
+      data: { theme }
     });
+    if (error) throw error;
   }
 
+  /**
+   * Uploads the avatar image to Supabase Storage (avatars/{user_id}),
+   * then saves the public URL to user_metadata.avatar_url.
+   */
+  async updateAvatar(file: File): Promise<string> {
+    const user = this.user();
+    if (!user) throw new Error('Not authenticated');
+
+    const filePath = `${user.id}`;
+    const { error: uploadErr } = await this.supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true, contentType: file.type });
+
+    if (uploadErr) throw uploadErr;
+
+    const { data: urlData } = this.supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+    const { error: metaErr } = await this.supabase.auth.updateUser({
+      data: { avatar_url: publicUrl }
+    });
+    if (metaErr) throw metaErr;
+
+    return publicUrl;
+  }
+
+  /** Removes the avatar from Storage and clears user_metadata.avatar_url. */
   async removeAvatar(): Promise<void> {
     const user = this.user();
     if (!user) throw new Error('Not authenticated');
 
-    // Delete from storage if it's a storage URL
-    const currentUrl = this.avatarUrl();
-    if (currentUrl && currentUrl.includes('/storage/')) {
-      const filePath = `avatars/${user.id}`;
-      await this.supabase.storage.from('avatars').remove([filePath]);
-    }
+    const filePath = `${user.id}`;
+    await this.supabase.storage.from('avatars').remove([filePath]);
 
     const { error } = await this.supabase.auth.updateUser({
       data: { avatar_url: null }
     });
     if (error) throw error;
   }
-
-  avatarUrl = computed<string | null>(() => this.user()?.user_metadata?.['avatar_url'] ?? null);
 }

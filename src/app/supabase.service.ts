@@ -325,18 +325,6 @@ export class SupabaseService {
     }));
 
     if (boards && boards.length > 0) {
-      // Keep the user's own board title in sync with their display_name
-      const ownBoard = boards.find(b => b.owner_id === userId);
-      if (ownBoard) {
-        const expectedTitle = `${display_name}'s Board`;
-        if (ownBoard.title !== expectedTitle) {
-          await this.supabase
-            .from('boards')
-            .update({ title: expectedTitle })
-            .eq('id', ownBoard.id);
-          ownBoard.title = expectedTitle;
-        }
-      }
       return boards;
     }
 

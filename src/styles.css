@@ -33,3 +33,37 @@ html, body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ── Theme background images (must be global to apply to body) ── */
+body.theme-noir {
+  background-color: #000000;
+  background-image: url('/bg/noir.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+body.theme-mon-cheri {
+  background-color: #1a0505;
+  background-image: url('/bg/mon-cheri.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+body.theme-cotton-candy {
+  background-color: #fce4ec;
+  background-image: url('/bg/cotton-candy.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+body.theme-starry-night {
+  background-color: #0d1b4b;
+  background-image: url('/bg/starry-night.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
