@@ -78,7 +78,11 @@ a.user-email-neo:hover {
 }
 
 .header-separator-neo {
-  display: none;
+  width: 2px;
+  height: 36px;
+  background: #000000;
+  margin: 0 12px;
+  flex-shrink: 0;
 }
 
 .sign-out-btn-neo {
@@ -116,8 +120,10 @@ a.user-email-neo:hover {
 
 /* ── Navbar ──────────────────────────────────── */
 .app-navbar {
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   background: transparent;
   padding: 4px;
@@ -202,12 +208,93 @@ a.user-email-neo:hover {
   /* Chrome/Safari */
 }
 
-/* When showing the boards list view, allow vertical scrolling */
+/* When showing the boards list view, allow vertical scrolling and center content */
 .board-container:has(.boards-list-view) {
   padding: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+.boards-list-view {
+  width: 100%;
+  max-width: 1280px;
+  padding: 40px 48px;
+}
+
+/* ── Theme Image Picker ──────────────────────── */
+.theme-img-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.theme-img-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 2.5px solid transparent;
+  padding: 4px 4px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-img-btn:hover {
+  border-color: #000;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.theme-img-btn.selected {
+  border-color: #1E47F7;
+  box-shadow: 3px 3px 0 #1E47F7;
+}
+
+.theme-img-preview {
+  width: 100%;
+  height: 72px;
+  background-size: cover;
+  background-position: center;
+  border: 1.5px solid #ddd;
+}
+
+.theme-prev-default {
+  background-color: #f0f0f0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.theme-img-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+}
+
+.theme-img-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #1E47F7;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
 
 .board {
   display: flex;

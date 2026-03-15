@@ -37,7 +37,7 @@ html, body {
 /* ── Theme background images (must be global to apply to body) ── */
 body.theme-noir {
   background-color: #000000;
-  background-image: url('/bg/noir.jpg');
+  background-image: url('/bg/Noir.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -66,4 +66,158 @@ body.theme-starry-night {
   background-position: center;
   background-attachment: fixed;
 }
+
+/* Make board and dashboard containers transparent when a theme is active */
+body[class*="theme-"] .board-container,
+body[class*="theme-"] .dashboard-container {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   COTTON CANDY THEME
+   ────────────────────────────────────────────────────────── */
+body.theme-cotton-candy .app-header {
+  background: #e91e8c !important;
+  border-bottom-color: #b5006b !important;
+}
+body.theme-cotton-candy .logo-branding { color: #ffffff !important; -webkit-text-stroke-color: #000 !important; }
+body.theme-cotton-candy .app-title,
+body.theme-cotton-candy .app-subtitle,
+body.theme-cotton-candy .user-email-neo,
+body.theme-cotton-candy .sign-out-btn-neo { color: #ffffff !important; }
+body.theme-cotton-candy a.user-email-neo:hover { color: #80deea !important; }
+body.theme-cotton-candy .sign-out-btn-neo:hover { color: #80deea !important; }
+body.theme-cotton-candy .nav-link { color: #ffffff !important; }
+body.theme-cotton-candy .nav-link:hover,
+body.theme-cotton-candy .nav-link.active { background: #80deea !important; color: #000 !important; border-color: #000 !important; }
+body.theme-cotton-candy .board-nav-tool { color: #ffffff !important; background: transparent !important; border-color: transparent !important; }
+body.theme-cotton-candy .board-nav-tool:hover { background: #80deea !important; color: #000 !important; border-color: #000 !important; }
+body.theme-cotton-candy .profile-btn-neo.circle-profile { background: #80deea !important; border-color: #000 !important; }
+body.theme-cotton-candy .header-separator-neo { background: rgba(255,255,255,0.4) !important; }
+body.theme-cotton-candy .column { background: #ffffff !important; border-color: #e91e8c !important; }
+body.theme-cotton-candy .column.col-todo   { box-shadow: 3px 3px 0px 0px #80deea, 8px 8px 0px 0px #e91e8c !important; }
+body.theme-cotton-candy .column.col-inprogress { box-shadow: 3px 3px 0px 0px #e91e8c, 8px 8px 0px 0px #000 !important; }
+body.theme-cotton-candy .column.col-toreview   { box-shadow: 3px 3px 0px 0px #f06292, 8px 8px 0px 0px #000 !important; }
+body.theme-cotton-candy .column.col-done       { box-shadow: 3px 3px 0px 0px #80deea, 8px 8px 0px 0px #000 !important; }
+body.theme-cotton-candy .col-todo .column-dot       { background: #80deea !important; }
+body.theme-cotton-candy .col-inprogress .column-dot { background: #e91e8c !important; }
+body.theme-cotton-candy .col-toreview .column-dot   { background: #f06292 !important; }
+body.theme-cotton-candy .col-done .column-dot       { background: #80deea !important; }
+body.theme-cotton-candy .card { background: #fff !important; border-color: #e91e8c !important; }
+body.theme-cotton-candy .card-title { color: #1a1a2e !important; }
+body.theme-cotton-candy .column-title,
+body.theme-cotton-candy .column-count { color: #1a1a2e !important; }
+body.theme-cotton-candy .back-to-boards-btn { background: #80deea !important; border-color: #000 !important; color: #000 !important; }
+
+/* ──────────────────────────────────────────────────────────
+   NOIR THEME
+   ────────────────────────────────────────────────────────── */
+body.theme-noir .app-header {
+  background: #000000 !important;
+  border-bottom-color: #ffffff !important;
+}
+body.theme-noir .logo-branding { color: #ffffff !important; -webkit-text-stroke-color: #000 !important; text-shadow: none !important; }
+body.theme-noir .app-title,
+body.theme-noir .app-subtitle,
+body.theme-noir .user-email-neo,
+body.theme-noir .sign-out-btn-neo { color: #ffffff !important; }
+body.theme-noir a.user-email-neo:hover { color: #BDF522 !important; }
+body.theme-noir .sign-out-btn-neo:hover { color: #BDF522 !important; }
+body.theme-noir .nav-link { color: #ffffff !important; }
+body.theme-noir .nav-link:hover,
+body.theme-noir .nav-link.active { background: #ffffff !important; color: #000 !important; border-color: #ffffff !important; box-shadow: 3px 3px 0px #ffffff !important; }
+body.theme-noir .board-nav-tool { color: #ffffff !important; background: transparent !important; border-color: transparent !important; }
+body.theme-noir .board-nav-tool:hover { background: #ffffff !important; color: #000 !important; border-color: #ffffff !important; }
+body.theme-noir .profile-btn-neo.circle-profile { background: #333 !important; border-color: #ffffff !important; box-shadow: 2px 2px 0 #ffffff !important; }
+body.theme-noir .header-separator-neo { background: #ffffff !important; }
+body.theme-noir .column { background: #0a0a0a !important; border-color: #444 !important; }
+body.theme-noir .column.col-todo       { box-shadow: 3px 3px 0px 0px #1E47F7, 8px 8px 0px 0px #1E47F7 !important; border-color: #1E47F7 !important; }
+body.theme-noir .column.col-inprogress { box-shadow: 3px 3px 0px 0px #FE8616, 8px 8px 0px 0px #FE8616 !important; border-color: #FE8616 !important; }
+body.theme-noir .column.col-toreview   { box-shadow: 3px 3px 0px 0px #9A65ED, 8px 8px 0px 0px #9A65ED !important; border-color: #9A65ED !important; }
+body.theme-noir .column.col-done       { box-shadow: 3px 3px 0px 0px #BDF522, 8px 8px 0px 0px #BDF522 !important; border-color: #BDF522 !important; }
+body.theme-noir .column-title { color: #ffffff !important; }
+body.theme-noir .column-count { background: #333 !important; color: #ffffff !important; }
+body.theme-noir .card { background: #111111 !important; border-color: #444 !important; box-shadow: 2px 2px 0px 0px #444 !important; }
+body.theme-noir .card-title { color: #ffffff !important; }
+body.theme-noir .card-description { color: #aaaaaa !important; }
+body.theme-noir .card-tag { background: #ffffff !important; color: #000 !important; }
+body.theme-noir .add-card-btn { background: #000 !important; border-color: #555 !important; color: #fff !important; }
+body.theme-noir .empty-drop-zone { border-color: #444 !important; color: #666 !important; }
+body.theme-noir .add-card-bottom-btn { color: #aaa !important; }
+body.theme-noir .back-to-boards-btn { background: #111 !important; border-color: #fff !important; color: #fff !important; }
+
+/* ──────────────────────────────────────────────────────────
+   STARRY NIGHT THEME
+   ────────────────────────────────────────────────────────── */
+body.theme-starry-night .app-header {
+  background: #1a237e !important;
+  border-bottom-color: #ffd600 !important;
+}
+body.theme-starry-night .logo-branding { color: #ffd600 !important; -webkit-text-stroke-color: #000 !important; }
+body.theme-starry-night .app-title,
+body.theme-starry-night .app-subtitle,
+body.theme-starry-night .user-email-neo,
+body.theme-starry-night .sign-out-btn-neo { color: #ffd600 !important; }
+body.theme-starry-night a.user-email-neo:hover { color: #ffffff !important; }
+body.theme-starry-night .sign-out-btn-neo:hover { color: #ffffff !important; }
+body.theme-starry-night .nav-link { color: #ffd600 !important; }
+body.theme-starry-night .nav-link:hover,
+body.theme-starry-night .nav-link.active { background: #ffd600 !important; color: #000 !important; border-color: #000 !important; box-shadow: 3px 3px 0px #000 !important; }
+body.theme-starry-night .board-nav-tool { color: #ffd600 !important; background: transparent !important; border-color: transparent !important; }
+body.theme-starry-night .board-nav-tool:hover { background: #ffd600 !important; color: #000 !important; border-color: #000 !important; }
+body.theme-starry-night .profile-btn-neo.circle-profile { background: #ffd600 !important; border-color: #000 !important; box-shadow: 2px 2px 0 #000 !important; }
+body.theme-starry-night .header-separator-neo { background: #ffd600 !important; }
+body.theme-starry-night .column { background: #f5f0e8 !important; border-color: #1a237e !important; }
+body.theme-starry-night .column.col-todo       { box-shadow: 3px 3px 0px 0px #1E47F7, 8px 8px 0px 0px #1a237e !important; }
+body.theme-starry-night .column.col-inprogress { box-shadow: 3px 3px 0px 0px #FE8616, 8px 8px 0px 0px #1a237e !important; }
+body.theme-starry-night .column.col-toreview   { box-shadow: 3px 3px 0px 0px #9A65ED, 8px 8px 0px 0px #1a237e !important; }
+body.theme-starry-night .column.col-done       { box-shadow: 3px 3px 0px 0px #ffd600, 8px 8px 0px 0px #1a237e !important; }
+body.theme-starry-night .card { background: #f5f0e8 !important; border-color: #1a237e !important; }
+body.theme-starry-night .card-title { color: #1a237e !important; }
+body.theme-starry-night .card-description { color: #3949ab !important; }
+body.theme-starry-night .column-title { color: #1a237e !important; }
+body.theme-starry-night .column-count { background: #d0c8b0 !important; color: #1a237e !important; }
+body.theme-starry-night .empty-drop-zone { border-color: #aaa !important; color: #888 !important; }
+body.theme-starry-night .back-to-boards-btn { background: #f5f0e8 !important; border-color: #1a237e !important; color: #1a237e !important; }
+
+/* ──────────────────────────────────────────────────────────
+   MON CHERI THEME
+   ────────────────────────────────────────────────────────── */
+body.theme-mon-cheri .app-header {
+  background: #6b0f1a !important;
+  border-bottom-color: #3d0009 !important;
+}
+body.theme-mon-cheri .logo-branding { color: #fdf6ee !important; -webkit-text-stroke-color: #000 !important; }
+body.theme-mon-cheri .app-title,
+body.theme-mon-cheri .app-subtitle,
+body.theme-mon-cheri .user-email-neo,
+body.theme-mon-cheri .sign-out-btn-neo { color: #fdf6ee !important; }
+body.theme-mon-cheri a.user-email-neo:hover { color: #f9a0b0 !important; }
+body.theme-mon-cheri .sign-out-btn-neo:hover { color: #f9a0b0 !important; }
+body.theme-mon-cheri .nav-link { color: #fdf6ee !important; }
+body.theme-mon-cheri .nav-link:hover,
+body.theme-mon-cheri .nav-link.active { background: #fdf6ee !important; color: #6b0f1a !important; border-color: #000 !important; box-shadow: 3px 3px 0px #000 !important; }
+body.theme-mon-cheri .board-nav-tool { color: #fdf6ee !important; background: transparent !important; border-color: transparent !important; }
+body.theme-mon-cheri .board-nav-tool:hover { background: #fdf6ee !important; color: #6b0f1a !important; border-color: #000 !important; }
+body.theme-mon-cheri .profile-btn-neo.circle-profile { background: #f9a0b0 !important; border-color: #000 !important; box-shadow: 2px 2px 0 #000 !important; }
+body.theme-mon-cheri .header-separator-neo { background: rgba(253,246,238,0.4) !important; }
+body.theme-mon-cheri .column { background: #fdf6ee !important; border-color: #6b0f1a !important; }
+body.theme-mon-cheri .column.col-todo       { box-shadow: 3px 3px 0px 0px #c62a47, 8px 8px 0px 0px #6b0f1a !important; }
+body.theme-mon-cheri .column.col-inprogress { box-shadow: 3px 3px 0px 0px #f06292, 8px 8px 0px 0px #6b0f1a !important; }
+body.theme-mon-cheri .column.col-toreview   { box-shadow: 3px 3px 0px 0px #ad1457, 8px 8px 0px 0px #6b0f1a !important; }
+body.theme-mon-cheri .column.col-done       { box-shadow: 3px 3px 0px 0px #880e4f, 8px 8px 0px 0px #6b0f1a !important; }
+body.theme-mon-cheri .col-todo .column-dot       { background: #c62a47 !important; }
+body.theme-mon-cheri .col-inprogress .column-dot { background: #f06292 !important; }
+body.theme-mon-cheri .col-toreview .column-dot   { background: #ad1457 !important; }
+body.theme-mon-cheri .col-done .column-dot       { background: #880e4f !important; }
+body.theme-mon-cheri .card { background: #fdf6ee !important; border-color: #6b0f1a !important; }
+body.theme-mon-cheri .card-title { color: #6b0f1a !important; }
+body.theme-mon-cheri .card-description { color: #8d3040 !important; }
+body.theme-mon-cheri .column-title { color: #6b0f1a !important; }
+body.theme-mon-cheri .column-count { background: #f9cdd3 !important; color: #6b0f1a !important; }
+body.theme-mon-cheri .empty-drop-zone { border-color: #c9a0a8 !important; color: #8d3040 !important; }
+body.theme-mon-cheri .back-to-boards-btn { background: #fdf6ee !important; border-color: #6b0f1a !important; color: #6b0f1a !important; }
+
+
 

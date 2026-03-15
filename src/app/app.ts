@@ -59,8 +59,8 @@ export class App implements OnInit, OnDestroy {
   private realtimeChannel: RealtimeChannel | null = null;
 
   // ── Board state ───────────────────────────────────────────────────────────
-  activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number; progress?: number } | null>(null);
-  accessibleBoards = signal<{ id: string; title: string; owner_id: string; color?: string; member_count?: number; progress?: number }[]>([]);
+  activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; theme?: ThemeKey; member_count?: number; progress?: number } | null>(null);
+  accessibleBoards = signal<{ id: string; title: string; owner_id: string; color?: string; theme?: ThemeKey; member_count?: number; progress?: number }[]>([]);
   columns = signal<Column[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
@@ -97,6 +97,7 @@ export class App implements OnInit, OnDestroy {
   editBoardTitle = signal('');
   editBoardDescription = signal('');
   editBoardColor = signal('#BDF522');
+  editBoardTheme = signal<ThemeKey>('default');
   editBoardLoading = signal(false);
   editBoardError = signal<string | null>(null);
 
@@ -172,13 +173,6 @@ export class App implements OnInit, OnDestroy {
   });
 
   constructor() {
-    // Sync theme with Supabase
-    effect(() => {
-      const saved = this.authService.savedTheme();
-      this.activeTheme.set(saved);
-      this.applyTheme(saved);
-    });
-
     // When session changes (login / logout), fetch boards list; clear on logout
     effect(() => {
       const session = this.authService.session();
@@ -200,6 +194,7 @@ export class App implements OnInit, OnDestroy {
         this.activityLogs.set([]);
         this.boardMembers.set([]);
         this.loading.set(false);
+        this.applyTheme('default');
       }
     });
   }
@@ -298,6 +293,11 @@ export class App implements OnInit, OnDestroy {
 
       this.activeBoard.set(board);
 
+      // Apply this board's theme
+      const boardTheme = (board.theme as ThemeKey) ?? 'default';
+      this.activeTheme.set(boardTheme);
+      this.applyTheme(boardTheme);
+
       // 2. Load columns, cards, subtasks
       const cols = await this.supabase.loadBoard(board.id);
       if (cols.length === 0 && board.owner_id === user.id) {
@@ -356,6 +356,7 @@ export class App implements OnInit, OnDestroy {
     this.viewMode.set('list');
     this.activeBoard.set(null);
     this.columns.set([]);
+    this.applyTheme('default');
     this.router.navigate(['/boards'], { replaceUrl: true });
   }
 
@@ -420,6 +421,7 @@ export class App implements OnInit, OnDestroy {
     this.editBoardTitle.set(board.title);
     this.editBoardDescription.set(board.description || '');
     this.editBoardColor.set(board.color || '#BDF522');
+    this.editBoardTheme.set((board.theme as ThemeKey) ?? 'default');
     this.editBoardError.set(null);
     this.showEditBoardModal.set(true);
   }
@@ -439,17 +441,20 @@ export class App implements OnInit, OnDestroy {
     try {
       const description = this.editBoardDescription().trim();
       const color = this.editBoardColor();
-      await this.supabase.updateBoard(boardId, title, description, color);
+      const theme = this.editBoardTheme();
+      await this.supabase.updateBoard(boardId, title, description, color, theme);
 
       // Update local lists
       this.accessibleBoards.update(boards =>
-        boards.map(b => b.id === boardId ? { ...b, title, description, color } : b)
+        boards.map(b => b.id === boardId ? { ...b, title, description, color, theme } : b)
       );
 
-      // If editing the active board, update that too
+      // If editing the active board, update + re-apply theme
       const active = this.activeBoard();
       if (active && active.id === boardId) {
-        this.activeBoard.set({ ...active, title, color });
+        this.activeBoard.set({ ...active, title, color, theme });
+        this.activeTheme.set(theme);
+        this.applyTheme(theme);
       }
 
       this.closeEditBoardModal();

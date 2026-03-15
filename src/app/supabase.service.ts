@@ -314,7 +314,7 @@ export class SupabaseService {
 
     const { data: boardsData, error: fetchErr } = await this.supabase
       .from('boards')
-      .select('id, title, description, owner_id, color, board_members(count)')
+      .select('id, title, description, owner_id, color, theme, board_members(count)')
       .order('created_at', { ascending: true });
 
     if (fetchErr) throw fetchErr;
@@ -373,13 +373,14 @@ export class SupabaseService {
     return { id: boardId, title: title.trim(), owner_id: userId, color: boardColor, member_count: 1 };
   }
 
-  async updateBoard(boardId: string, title: string, description?: string, color?: string): Promise<void> {
+  async updateBoard(boardId: string, title: string, description?: string, color?: string, theme?: string): Promise<void> {
     const { error } = await this.supabase
       .from('boards')
       .update({
         title: title.trim(),
         description: description?.trim() || null,
-        color
+        color,
+        theme: theme ?? null
       })
       .eq('id', boardId);
     if (error) throw error;

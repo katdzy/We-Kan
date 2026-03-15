@@ -211,21 +211,6 @@
 
     <div class="header-separator-neo"></div>
 
-    <button class="board-nav-tool" (click)="showThemePicker.set(true)" title="Change Theme" style="border:none;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 2a10 10 0 0 1 0 20" fill="currentColor" opacity="0.15"/>
-        <circle cx="12" cy="8" r="1.5" fill="currentColor"/>
-        <circle cx="16" cy="12" r="1.5" fill="currentColor"/>
-        <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
-        <circle cx="8" cy="12" r="1.5" fill="currentColor"/>
-      </svg>
-      Theme
-    </button>
-
-    <div class="header-separator-neo"></div>
-
     <button class="sign-out-btn-neo" (click)="signOut()" title="Sign out">
       Sign out
     </button>
@@ -335,7 +320,6 @@
     <div class="board-type-tag" [class.group-board]="(activeBoard()?.member_count ?? 1) > 1">
       {{ (activeBoard()?.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
     </div>
-
     <div class="board-header-progress">
       <div class="bhp-track">
         <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.color || '#BDF522'">
@@ -350,7 +334,6 @@
       [class.col-inprogress]="column.title === 'In Progress'" [class.col-toreview]="column.title === 'To Review'"
       [class.col-done]="column.title === 'Done'" (dragover)="onDragOver($event, column.id)"
       (drop)="onDrop($event, column.id)">
-      <!-- Column Header -->
       <div class="column-header">
         <div class="column-title-row">
           <span class="column-dot"></span>
@@ -365,20 +348,14 @@
           </svg>
         </button>
       </div>
-
       <div class="column-accent-bar" [style.background]="column.color"></div>
-
-      <!-- Cards -->
       <div class="cards-list">
         @for (card of column.cards; track trackCard($index, card)) {
         <div class="card" draggable="true" [class.drag-over-card]="dragOverCardId() === card.id"
           (dragstart)="onDragStart($event, card, column.id)" (dragend)="onDragEnd($event)"
           (dragover)="onDragOver($event, column.id, card.id)" (drop)="onDrop($event, column.id, card.id)">
-          <!-- Card Header -->
           <div class="card-header">
-            @if (card.tag) {
-            <span class="card-tag">{{ card.tag }}</span>
-            }
+            @if (card.tag) { <span class="card-tag">{{ card.tag }}</span> }
             <div class="card-actions">
               <button class="card-action-btn" (click)="openEditModal(card, column.id)" title="Edit">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -399,14 +376,8 @@
               </button>
             </div>
           </div>
-
           <h3 class="card-title">{{ card.title }}</h3>
-
-          @if (card.description) {
-          <p class="card-description">{{ card.description }}</p>
-          }
-
-          <!-- Progress bar -->
+          @if (card.description) { <p class="card-description">{{ card.description }}</p> }
           @if (card.subtasks.length > 0) {
           <div class="card-progress">
             <div class="progress-header">
@@ -418,8 +389,6 @@
                 [class.progress-complete]="progress(card) === 100"></div>
             </div>
           </div>
-
-          <!-- Subtasks list -->
           <ul class="subtask-list">
             @for (subtask of card.subtasks; track trackSubtask($index, subtask)) {
             <li class="subtask-item" [class.subtask-done]="subtask.done">
@@ -438,12 +407,9 @@
             }
           </ul>
           }
-
-          <!-- Card Footer -->
           <div class="card-footer">
             <span class="priority-badge" [class]="'priority-' + card.priority">
-              <span class="priority-dot"></span>
-              {{ card.priority }}
+              <span class="priority-dot"></span>{{ card.priority }}
             </span>
             <div class="drag-handle">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -455,16 +421,12 @@
           </div>
         </div>
         }
-
-        <!-- Empty state drop zone -->
         @if (column.cards.length === 0) {
         <div class="empty-drop-zone" (dragover)="onDragOver($event, column.id)" (drop)="onDrop($event, column.id)">
           <span>Drop cards here</span>
         </div>
         }
       </div>
-
-      <!-- Add card button at bottom -->
       <button class="add-card-bottom-btn" (click)="openAddModal(column.id)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round">
@@ -482,6 +444,247 @@
   <router-outlet></router-outlet>
   }
 </main>
+
+
+<!-- Page Header -->
+<div class="boards-page-header">
+  <div class="boards-page-header-text">
+    <h1 class="boards-page-title">Boards</h1>
+    <p class="boards-page-subtitle">View your projects and manage your boards.</p>
+  </div>
+  <button class="add-new-board-btn" (click)="openCreateBoardModal()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+    Add New Board
+  </button>
+</div>
+
+@if (loading()) {
+<div class="boards-cards-grid">
+  @for (i of [1,2,3]; track i) {
+  <div class="board-neo-card skeleton-neo"></div>
+  }
+</div>
+} @else if (error()) {
+<div class="boards-list-empty">⚠️ {{ error() }}</div>
+} @else if (accessibleBoards().length === 0) {
+<div class="boards-list-empty">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </svg>
+  <p>No boards yet. Create your first board!</p>
+</div>
+} @else {
+<div class="boards-cards-grid">
+  @for (board of accessibleBoards(); track board.id) {
+  <div class="board-neo-card" [class.menu-open]="openBoardMenuId() === board.id">
+    <!-- Card Preview Top -->
+    <div class="bnc-preview" [style.background]="board.color || '#BDF522'">
+      <h3 class="bnc-preview-title">{{ board.title }}</h3>
+      <div class="board-type-tag" [class.group-board]="(board.member_count ?? 1) > 1">
+        {{ (board.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
+      </div>
+      @if (isOwnerOfBoard(board)) {
+      <div class="bnc-menu-wrap" (click)="$event.stopPropagation()">
+        <button class="bnc-dots-btn" (click)="toggleBoardMenu($event, board.id)" title="Board options">
+          <svg width="5" height="18" viewBox="0 0 5 20" fill="currentColor">
+            <circle cx="2.5" cy="2.5" r="2.5" />
+            <circle cx="2.5" cy="10" r="2.5" />
+            <circle cx="2.5" cy="17.5" r="2.5" />
+          </svg>
+        </button>
+        @if (openBoardMenuId() === board.id) {
+        <div class="bnc-dropdown">
+          <button class="dropdown-item" (click)="openEditBoardModal($event, board)">Edit Board</button>
+          <button class="dropdown-item danger" (click)="openDeleteBoardModal($event, board.id)">Delete
+            Board</button>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Card Bottom -->
+    <div class="bnc-info">
+      <div class="bnc-progress-row">
+        <div class="bnc-progress-left">
+          <span class="bnc-progress-label">Progress Summary</span>
+          <div class="bnc-progress-track">
+            <div class="bnc-progress-fill" [style.width.%]="board.progress"
+              [style.background]="board.color || '#BDF522'"></div>
+          </div>
+        </div>
+        <span class="bnc-percent" [style.color]="board.color || '#BDF522'">{{ board.progress }}%</span>
+      </div>
+      <div class="bnc-footer">
+        <button class="bnc-view-btn" [style.background]="board.color || '#BDF522'" (click)="selectBoard(board.id)">
+          View
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+}
+
+<!-- ── We-KanBoard View ── -->
+@if (viewMode() === 'board') {
+<div class="board-info-banner">
+  <div class="board-type-tag" [class.group-board]="(activeBoard()?.member_count ?? 1) > 1">
+    {{ (activeBoard()?.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
+  </div>
+
+  <div class="board-header-progress">
+    <div class="bhp-track">
+      <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.color || '#BDF522'">
+      </div>
+    </div>
+    <span class="bhp-percent" [style.color]="activeBoard()?.color || '#BDF522'">{{ boardProgress() }}%</span>
+  </div>
+</div>
+<div class="board">
+  @for (column of columns(); track trackColumn($index, column)) {
+  <div class="column" [class.drag-over]="dragOverColumnId() === column.id" [class.col-todo]="column.title === 'To Do'"
+    [class.col-inprogress]="column.title === 'In Progress'" [class.col-toreview]="column.title === 'To Review'"
+    [class.col-done]="column.title === 'Done'" (dragover)="onDragOver($event, column.id)"
+    (drop)="onDrop($event, column.id)">
+    <!-- Column Header -->
+    <div class="column-header">
+      <div class="column-title-row">
+        <span class="column-dot"></span>
+        <h2 class="column-title">{{ column.title }}</h2>
+        <span class="column-count">{{ column.cards.length }}</span>
+      </div>
+      <button class="add-card-btn" (click)="openAddModal(column.id)" title="Add card">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="column-accent-bar" [style.background]="column.color"></div>
+
+    <!-- Cards -->
+    <div class="cards-list">
+      @for (card of column.cards; track trackCard($index, card)) {
+      <div class="card" draggable="true" [class.drag-over-card]="dragOverCardId() === card.id"
+        (dragstart)="onDragStart($event, card, column.id)" (dragend)="onDragEnd($event)"
+        (dragover)="onDragOver($event, column.id, card.id)" (drop)="onDrop($event, column.id, card.id)">
+        <!-- Card Header -->
+        <div class="card-header">
+          @if (card.tag) {
+          <span class="card-tag">{{ card.tag }}</span>
+          }
+          <div class="card-actions">
+            <button class="card-action-btn" (click)="openEditModal(card, column.id)" title="Edit">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
+            <button class="card-action-btn delete" (click)="deleteCard(card.id, column.id)" title="Delete">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4h6v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <h3 class="card-title">{{ card.title }}</h3>
+
+        @if (card.description) {
+        <p class="card-description">{{ card.description }}</p>
+        }
+
+        <!-- Progress bar -->
+        @if (card.subtasks.length > 0) {
+        <div class="card-progress">
+          <div class="progress-header">
+            <span class="progress-label">Progress</span>
+            <span class="progress-percent">{{ progress(card) }}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="progress(card)"
+              [class.progress-complete]="progress(card) === 100"></div>
+          </div>
+        </div>
+
+        <!-- Subtasks list -->
+        <ul class="subtask-list">
+          @for (subtask of card.subtasks; track trackSubtask($index, subtask)) {
+          <li class="subtask-item" [class.subtask-done]="subtask.done">
+            <button class="subtask-checkbox" [class.checked]="subtask.done"
+              (click)="toggleSubtask(card.id, column.id, subtask.id)"
+              [attr.aria-label]="subtask.done ? 'Mark incomplete' : 'Mark complete'">
+              @if (subtask.done) {
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="2 6 5 9 10 3" />
+              </svg>
+              }
+            </button>
+            <span class="subtask-title">{{ subtask.title }}</span>
+          </li>
+          }
+        </ul>
+        }
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <span class="priority-badge" [class]="'priority-' + card.priority">
+            <span class="priority-dot"></span>
+            {{ card.priority }}
+          </span>
+          <div class="drag-handle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <line x1="4" y1="8" x2="20" y2="8" />
+              <line x1="4" y1="16" x2="20" y2="16" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Empty state drop zone -->
+      @if (column.cards.length === 0) {
+      <div class="empty-drop-zone" (dragover)="onDragOver($event, column.id)" (drop)="onDrop($event, column.id)">
+        <span>Drop cards here</span>
+      </div>
+      }
+    </div>
+
+    <!-- Add card button at bottom -->
+    <button class="add-card-bottom-btn" (click)="openAddModal(column.id)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      Add card
+    </button>
+  </div>
+  }
+</div>
+}
+
+} @else {
+<router-outlet></router-outlet>
+}
 
 <!-- ── Add Card Modal ──────────────────────────────────── -->
 @if (showAddModal()) {
@@ -770,7 +973,6 @@
 </div>
 }
 
-}
 
 <!-- ── Create Board Modal ──────────────────────────────────── -->
 @if (showCreateBoardModal()) {
@@ -838,7 +1040,7 @@
 <!-- ── Edit Board Modal ──────────────────────────────────── -->
 @if (showEditBoardModal()) {
 <div class="modal-backdrop neo-backdrop" (click)="closeEditBoardModal()">
-  <div class="modal create-board-modal" (click)="$event.stopPropagation()">
+  <div class="modal create-board-modal" style="max-width:520px;" (click)="$event.stopPropagation()">
     <div class="neo-modal-header">
       <div class="neo-window-controls">
         <span class="neo-dot" style="background-color: #FE8616;"></span>
@@ -864,19 +1066,54 @@
       <textarea placeholder="What is this board about?" [value]="editBoardDescription()"
         (input)="editBoardDescription.set($any($event.target).value)" class="neo-input" rows="2"></textarea>
 
-      <label class="neo-label">Pick Thumbnail Color</label>
-      <div class="neo-color-picker">
-        @for (color of boardColorOptions; track color) {
-        <div class="neo-color-option" [style.backgroundColor]="color" [class.selected]="editBoardColor() === color"
-          (click)="editBoardColor.set(color)" [title]="color">
-          @if (editBoardColor() === color) {
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+      <!-- Theme Picker -->
+      <label class="neo-label" style="margin-top:8px;">Choose Theme</label>
+      <div class="theme-img-picker">
+        <!-- Default -->
+        <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'default'"
+          (click)="editBoardTheme.set('default')">
+          <div class="theme-img-preview theme-prev-default"></div>
+          <span class="theme-img-label">Default</span>
+          @if (editBoardTheme() === 'default') {
+          <span class="theme-img-check">✓</span>
           }
-        </div>
-        }
+        </button>
+        <!-- Cotton Candy -->
+        <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'cotton-candy'"
+          (click)="editBoardTheme.set('cotton-candy')">
+          <div class="theme-img-preview" style="background-image:url('/bg/cotton-candy.jpeg');"></div>
+          <span class="theme-img-label">Cotton Candy</span>
+          @if (editBoardTheme() === 'cotton-candy') {
+          <span class="theme-img-check">✓</span>
+          }
+        </button>
+        <!-- Noir -->
+        <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'noir'"
+          (click)="editBoardTheme.set('noir')">
+          <div class="theme-img-preview" style="background-image:url('/bg/Noir.jpg');"></div>
+          <span class="theme-img-label">Noir</span>
+          @if (editBoardTheme() === 'noir') {
+          <span class="theme-img-check">✓</span>
+          }
+        </button>
+        <!-- Starry Night -->
+        <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'starry-night'"
+          (click)="editBoardTheme.set('starry-night')">
+          <div class="theme-img-preview" style="background-image:url('/bg/starry-night.jpg');"></div>
+          <span class="theme-img-label">Starry Night</span>
+          @if (editBoardTheme() === 'starry-night') {
+          <span class="theme-img-check">✓</span>
+          }
+        </button>
+        <!-- Mon Cheri -->
+        <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'mon-cheri'"
+          (click)="editBoardTheme.set('mon-cheri')">
+          <div class="theme-img-preview" style="background-image:url('/bg/mon-cheri.png');"></div>
+          <span class="theme-img-label">Mon Chéri</span>
+          @if (editBoardTheme() === 'mon-cheri') {
+          <span class="theme-img-check">✓</span>
+          }
+        </button>
       </div>
 
 
