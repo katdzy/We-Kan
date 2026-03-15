@@ -74,19 +74,33 @@ export class AuthService {
   }
 
   /**
-   * Uploads the avatar image to Supabase Storage (avatars/{user_id}),
+   * Uploads the avatar image to Supabase Storage (avatars/{user_id}_{timestamp}),
+   * deletes the old avatar first to avoid Storage lock conflicts,
    * then saves the public URL to user_metadata.avatar_url.
    */
   async updateAvatar(file: File): Promise<string> {
     const user = this.user();
     if (!user) throw new Error('Not authenticated');
 
-    const filePath = `${user.id}`;
+    // Remove any existing avatar to prevent "Lock broken" errors from upsert
+    const oldUrl = this.avatarUrl();
+    if (oldUrl) {
+      // Extract the stored path from the old URL (everything after /avatars/)
+      const match = oldUrl.match(/\/avatars\/([^?]+)/);
+      if (match?.[1]) {
+        await this.supabase.storage.from('avatars').remove([match[1]]);
+      }
+    }
+
+    // Use a unique path per upload to avoid any lingering lock issues
+    const ext = file.name.split('.').pop() ?? 'jpg';
+    const filePath = `${user.id}_${Date.now()}.${ext}`;
+
     const { error: uploadErr } = await this.supabase.storage
       .from('avatars')
-      .upload(filePath, file, { upsert: true, contentType: file.type });
+      .upload(filePath, file, { contentType: file.type });
 
-    if (uploadErr) throw uploadErr;
+    if (uploadErr) throw new Error(uploadErr.message);
 
     const { data: urlData } = this.supabase.storage
       .from('avatars')
@@ -97,7 +111,7 @@ export class AuthService {
     const { error: metaErr } = await this.supabase.auth.updateUser({
       data: { avatar_url: publicUrl }
     });
-    if (metaErr) throw metaErr;
+    if (metaErr) throw new Error(metaErr.message);
 
     return publicUrl;
   }
@@ -107,12 +121,18 @@ export class AuthService {
     const user = this.user();
     if (!user) throw new Error('Not authenticated');
 
-    const filePath = `${user.id}`;
-    await this.supabase.storage.from('avatars').remove([filePath]);
+    // Extract actual stored path from the URL to remove the correct file
+    const oldUrl = this.avatarUrl();
+    if (oldUrl) {
+      const match = oldUrl.match(/\/avatars\/([^?]+)/);
+      if (match?.[1]) {
+        await this.supabase.storage.from('avatars').remove([match[1]]);
+      }
+    }
 
     const { error } = await this.supabase.auth.updateUser({
       data: { avatar_url: null }
     });
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   }
 }
