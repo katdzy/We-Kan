@@ -7,10 +7,10 @@
       <div class="auth-logo-icon">
         <svg width="42" height="42" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
           style="margin-right: 12px; overflow: visible;">
-          <rect width="12" height="12" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
-          <rect x="15" width="13" height="7" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
-          <rect x="15" y="10" width="13" height="18" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
-          <rect y="15" width="12" height="13" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
+          <rect class="logo-rect" width="12" height="12" rx="3" />
+          <rect class="logo-rect" x="15" width="13" height="7" rx="3" />
+          <rect class="logo-rect" x="15" y="10" width="13" height="18" rx="3" />
+          <rect class="logo-rect" y="15" width="12" height="13" rx="3" />
         </svg>
       </div>
       <h1 class="auth-title-neo">We-Kan</h1>
@@ -110,13 +110,13 @@
 <!-- Header -->
 <header class="app-header">
   <div class="header-left">
-    <div class="logo-branding" routerLink="/" style="cursor: pointer;" title="Home">
+    <div class="logo-branding" routerLink="/" (click)="selectTheme('default')" style="cursor: pointer;" title="Home">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
         style="margin-right: 12px; overflow: visible;">
-        <rect width="12" height="12" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
-        <rect x="15" width="13" height="7" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
-        <rect x="15" y="10" width="13" height="18" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
-        <rect y="15" width="12" height="13" rx="3" fill="#BDF522" stroke="#000000" stroke-width="2" />
+        <rect class="logo-rect" width="12" height="12" rx="3" />
+        <rect class="logo-rect" x="15" width="13" height="7" rx="3" />
+        <rect class="logo-rect" x="15" y="10" width="13" height="18" rx="3" />
+        <rect class="logo-rect" y="15" width="12" height="13" rx="3" />
       </svg>
       We-Kan
     </div>
@@ -1081,7 +1081,7 @@
         <!-- Cotton Candy -->
         <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'cotton-candy'"
           (click)="editBoardTheme.set('cotton-candy')">
-          <div class="theme-img-preview" style="background-image:url('/bg/cotton-candy.jpeg');"></div>
+          <div class="theme-img-preview" style="background-image:url('/bg/cotton-candy.png');"></div>
           <span class="theme-img-label">Cotton Candy</span>
           @if (editBoardTheme() === 'cotton-candy') {
           <span class="theme-img-check">✓</span>
@@ -1090,7 +1090,7 @@
         <!-- Noir -->
         <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'noir'"
           (click)="editBoardTheme.set('noir')">
-          <div class="theme-img-preview" style="background-image:url('/bg/Noir.jpg');"></div>
+          <div class="theme-img-preview" style="background-image:url('/bg/Noir.png');"></div>
           <span class="theme-img-label">Noir</span>
           @if (editBoardTheme() === 'noir') {
           <span class="theme-img-check">✓</span>
@@ -1099,7 +1099,7 @@
         <!-- Starry Night -->
         <button class="theme-img-btn" [class.selected]="editBoardTheme() === 'starry-night'"
           (click)="editBoardTheme.set('starry-night')">
-          <div class="theme-img-preview" style="background-image:url('/bg/starry-night.jpg');"></div>
+          <div class="theme-img-preview" style="background-image:url('/bg/starry-night.png');"></div>
           <span class="theme-img-label">Starry Night</span>
           @if (editBoardTheme() === 'starry-night') {
           <span class="theme-img-check">✓</span>

@@ -28,6 +28,12 @@
   letter-spacing: 0.03em;
 }
 
+.logo-branding .logo-rect, .auth-logo-icon .logo-rect {
+  fill: #BDF522;
+  stroke: #000000;
+  stroke-width: 2;
+}
+
 .header-right {
   display: flex;
   align-items: center;
@@ -147,7 +153,7 @@ a.user-email-neo:hover {
   background: #1E47F7;
   border: 2.5px solid #000000;
   color: #FFFFFF;
-  box-shadow: 3px 3px 0px #000000;
+  box-shadow: 2px 2px 0px 0px #000000, 6px 6px 0px 0px #000000;
 }
 
 .board-nav-tool {
@@ -170,7 +176,7 @@ a.user-email-neo:hover {
   background: #1E47F7;
   border: 2.5px solid #000000;
   color: #FFFFFF;
-  box-shadow: 3px 3px 0px #000000;
+  box-shadow: 2px 2px 0px 0px #000000, 6px 6px 0px 0px #000000;
 }
 
 .board-nav-tool:hover svg {
@@ -3320,15 +3326,6 @@ body.theme-noir .profile-btn-neo.circle-profile {
   box-shadow: 2px 2px 0px #ffffff !important;
 }
 
-body.theme-noir .back-to-boards-btn {
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-}
-
-body.theme-noir .back-to-boards-btn:hover {
-  background: #ffffff !important;
-  color: #000000 !important;
-}
 
 body.theme-noir .header-icon-btn {
   color: #ffffff !important;
@@ -3454,15 +3451,6 @@ body.theme-noir .col-add-btn:hover {
   color: #000000 !important;
 }
 
-body.theme-noir .add-card-btn {
-  color: #aaaaaa;
-  border-top-color: #222222;
-}
-
-body.theme-noir .add-card-btn:hover {
-  color: #ffffff !important;
-  background: #111111 !important;
-}
 
 body.theme-noir .drop-zone {
   border-color: #333333;
@@ -3848,15 +3836,6 @@ body.theme-mon-cheri .profile-btn-neo.circle-profile {
   box-shadow: 2px 2px 0px #3d0000 !important;
 }
 
-body.theme-mon-cheri .back-to-boards-btn {
-  color: #fdf6ee !important;
-  border-color: #fdf6ee !important;
-}
-
-body.theme-mon-cheri .back-to-boards-btn:hover {
-  background: #fdf6ee !important;
-  color: #3d0000 !important;
-}
 
 body.theme-mon-cheri .bnc-preview,
 body.theme-mon-cheri .bnc-progress-track,
@@ -4201,10 +4180,6 @@ body.theme-cotton-candy .profile-btn-neo.circle-profile {
   border-color: #000000 !important;
 }
 
-body.theme-cotton-candy .back-to-boards-btn {
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-}
 
 body.theme-cotton-candy .bnc-preview,
 body.theme-cotton-candy .bnc-progress-track,
@@ -4308,15 +4283,6 @@ body.theme-cotton-candy .col-add-btn:hover {
   border-color: #000000 !important;
 }
 
-body.theme-cotton-candy .add-card-btn {
-  color: #78909c;
-  border-top-color: #f8bbd0;
-}
-
-body.theme-cotton-candy .add-card-btn:hover {
-  color: #c2185b !important;
-  background: #fce4ec !important;
-}
 
 body.theme-cotton-candy .column-header {
   border-bottom-color: #f8bbd0;
@@ -4495,15 +4461,6 @@ body.theme-starry-night .profile-btn-neo.circle-profile {
   box-shadow: 2px 2px 0px #0d1b4b !important;
 }
 
-body.theme-starry-night .back-to-boards-btn {
-  color: #ffd600 !important;
-  border-color: #ffd600 !important;
-}
-
-body.theme-starry-night .back-to-boards-btn:hover {
-  background: #ffd600 !important;
-  color: #1a237e !important;
-}
 
 body.theme-starry-night .bnc-preview,
 body.theme-starry-night .bnc-progress-track,
@@ -4614,15 +4571,6 @@ body.theme-starry-night .col-add-btn:hover {
   border-color: #091536 !important;
 }
 
-body.theme-starry-night .add-card-btn {
-  color: #455a9e;
-  border-top-color: #c5cae9;
-}
-
-body.theme-starry-night .add-card-btn:hover {
-  color: #1a237e !important;
-  background: #e8eaf6 !important;
-}
 
 body.theme-starry-night .column-header {
   border-bottom-color: #c5cae9;
