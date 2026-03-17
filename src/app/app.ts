@@ -3,7 +3,7 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router, RouterLinkActive, ActivatedRoute } from '@angular/router';
-import { SupabaseService, ActivityLog, BoardMember } from './supabase.service';
+import { SupabaseService, ActivityLog, BoardMember, BoardInvitation } from './supabase.service';
 import { AuthService } from './auth.service';
 
 export type ThemeKey = 'default' | 'noir' | 'mon-cheri' | 'cotton-candy' | 'starry-night';
@@ -57,6 +57,12 @@ export class App implements OnInit, OnDestroy {
   router = inject(Router);
   private route = inject(ActivatedRoute);
   private realtimeChannel: RealtimeChannel | null = null;
+  private invitationsPollInterval: ReturnType<typeof setInterval> | null = null;
+  private subscribedBoardId: string | null = null;
+
+  // ── Invitations state ─────────────────────────────────────────────────────
+  pendingInvitations = signal<BoardInvitation[]>([]);
+  showNotifications = signal(false);
 
   // ── Board state ───────────────────────────────────────────────────────────
   activeBoard = signal<{ id: string; title: string; owner_id: string; color?: string; theme?: ThemeKey; member_count?: number; progress?: number } | null>(null);
@@ -193,9 +199,22 @@ export class App implements OnInit, OnDestroy {
         this.columns.set([]);
         this.activityLogs.set([]);
         this.boardMembers.set([]);
+        this.pendingInvitations.set([]);
+        this.showNotifications.set(false);
         this.loading.set(false);
         this.applyTheme('default');
       }
+    });
+
+    // Poll for pending invitations every 30 seconds
+    effect(() => {
+       const user = this.authService.user();
+       if (user && user.email) {
+          this.loadPendingInvitations(user.email);
+          this.startInvitationPolling(user.email);
+       } else {
+          this.stopInvitationPolling();
+       }
     });
   }
 
@@ -254,6 +273,7 @@ export class App implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.teardownRealtimeSubscription();
+    this.stopInvitationPolling();
   }
 
   // ── Board load ────────────────────────────────────────────────────────────
@@ -327,9 +347,11 @@ export class App implements OnInit, OnDestroy {
 
   /** Sets up a Supabase real-time WebSocket subscription for the active board. */
   private setupRealtimeSubscription(boardId: string) {
+    // Skip if already subscribed to this exact board
+    if (this.subscribedBoardId === boardId) return;
     // Tear down any existing subscription first
     this.teardownRealtimeSubscription();
-
+    this.subscribedBoardId = boardId;
     this.realtimeChannel = this.supabase.subscribeToBoardChanges(boardId, () => {
       // Silently reload the board data in the background
       this.loadBoard(boardId, true);
@@ -341,6 +363,70 @@ export class App implements OnInit, OnDestroy {
     if (this.realtimeChannel) {
       this.supabase.unsubscribeFromBoard(this.realtimeChannel);
       this.realtimeChannel = null;
+      this.subscribedBoardId = null;
+    }
+  }
+
+  // ── Invitations ───────────────────────────────────────────────────────────
+  async loadPendingInvitations(email: string) {
+    try {
+      const invites = await this.supabase.getPendingInvitations(email);
+      this.pendingInvitations.set(invites);
+    } catch (err) {
+      console.error('Failed to load invitations:', err);
+    }
+  }
+
+  private startInvitationPolling(email: string) {
+    // Already polling — no-op
+    if (this.invitationsPollInterval !== null) return;
+    // Poll every 30 seconds
+    this.invitationsPollInterval = setInterval(() => {
+      this.loadPendingInvitations(email);
+    }, 30_000);
+  }
+
+  private stopInvitationPolling() {
+    if (this.invitationsPollInterval !== null) {
+      clearInterval(this.invitationsPollInterval);
+      this.invitationsPollInterval = null;
+    }
+  }
+
+  toggleNotifications() {
+     this.showNotifications.set(!this.showNotifications());
+  }
+
+  async acceptInvitation(invitationId: string, boardId: string) {
+    const user = this.authService.user();
+    if (!user) return;
+
+    try {
+      await this.supabase.acceptInvitation(invitationId, boardId, user.id);
+      // Remove from list
+      this.pendingInvitations.update(invites => invites.filter(i => i.id !== invitationId));
+      // Reload boards so the new one shows up
+      this.loadAccessibleBoards();
+      
+      // If notifications dropdown is empty, close it
+      if (this.pendingInvitations().length === 0) {
+         this.showNotifications.set(false);
+      }
+    } catch (err) {
+      console.error('Failed to accept invitation:', err);
+    }
+  }
+
+  async declineInvitation(invitationId: string) {
+    try {
+      await this.supabase.declineInvitation(invitationId);
+      this.pendingInvitations.update(invites => invites.filter(i => i.id !== invitationId));
+      
+      if (this.pendingInvitations().length === 0) {
+         this.showNotifications.set(false);
+      }
+    } catch (err) {
+      console.error('Failed to decline invitation:', err);
     }
   }
 

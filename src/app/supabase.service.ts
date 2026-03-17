@@ -20,6 +20,16 @@ export interface BoardMember {
   role: 'owner' | 'member';
 }
 
+export interface BoardInvitation {
+  id: string;
+  board_id: string;
+  inviter_id: string;
+  inviter_email: string;
+  invitee_email: string;
+  created_at: string;
+  board_title?: string;
+}
+
 // ── DB row shapes ─────────────────────────────────────────────────────────────
 interface ColumnRow {
   id: string;
@@ -56,12 +66,40 @@ const DEFAULT_COLUMNS = [
 ];
 
 // ── Service ───────────────────────────────────────────────────────────────────
+// Custom storage that falls back to sessionStorage when localStorage quota is exceeded.
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+    } catch {
+      return sessionStorage.getItem(key);
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      try {
+        sessionStorage.setItem(key, value);
+      } catch { /* ignore if both fail */ }
+    }
+  },
+  removeItem: (key: string): void => {
+    try { localStorage.removeItem(key); } catch { /* noop */ }
+    try { sessionStorage.removeItem(key); } catch { /* noop */ }
+  },
+};
+
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
   private supabase: SupabaseClient;
+  // Unique per service instance – ensures channel names don't collide across HMR reloads
+  private readonly sessionId = Math.random().toString(36).slice(2, 8);
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
+      auth: { storage: safeStorage },
+    });
   }
 
   // ── Load entire board ───────────────────────────────────────────────────────
@@ -463,16 +501,85 @@ export class SupabaseService {
   }
 
   async inviteMember(boardId: string, email: string): Promise<void> {
-    // Look up the user's UUID by email via a security-definer RPC
-    const { data: targetUserId, error: lookupErr } = await this.supabase
-      .rpc('get_user_id_by_email', { email_input: email });
-    if (lookupErr) throw lookupErr;
-    if (!targetUserId) throw new Error(`No user found with email: ${email}`);
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('Not logged in');
 
-    const { error } = await this.supabase.from('board_members').upsert(
-      { board_id: boardId, user_id: targetUserId, role: 'member' },
+    // Make sure we're not inserting a duplicate invitation
+    const { error } = await this.supabase
+      .from('board_invitations')
+      .insert({
+        board_id: boardId,
+        inviter_id: user.id,
+        invitee_email: email,
+      });
+
+    if (error) {
+      if (error.code === '23505') {
+         throw new Error('This user has already been invited.');
+      }
+      throw error;
+    }
+  }
+
+  async getPendingInvitations(email: string): Promise<BoardInvitation[]> {
+    // We only fetch invitations for this specific email (enforced by RLS)
+    const { data, error } = await this.supabase
+      .from('board_invitations')
+      .select('id, board_id, inviter_id, invitee_email, created_at, boards(title)')
+      .eq('invitee_email', email)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Fetch inviter emails via RPC for each invite
+    const invites: BoardInvitation[] = [];
+    for (const row of (data ?? [])) {
+      const { data: emailData } = await this.supabase
+        .rpc('get_user_email_by_id', { user_id_input: row.inviter_id });
+
+      let title = 'Unknown Board';
+      if (row.boards) {
+        if (Array.isArray(row.boards)) {
+           title = row.boards[0]?.title ?? 'Unknown Board';
+        } else {
+           title = (row.boards as any).title ?? 'Unknown Board';
+        }
+      }
+
+      invites.push({
+        id: row.id,
+        board_id: row.board_id,
+        inviter_id: row.inviter_id,
+        inviter_email: emailData ?? row.inviter_id,
+        invitee_email: row.invitee_email,
+        created_at: row.created_at,
+        board_title: title,
+      });
+    }
+    return invites;
+  }
+
+  async acceptInvitation(invitationId: string, boardId: string, userId: string): Promise<void> {
+    // 1. Insert into board_members
+    const { error: insertErr } = await this.supabase.from('board_members').upsert(
+      { board_id: boardId, user_id: userId, role: 'member' },
       { onConflict: 'board_id,user_id', ignoreDuplicates: true }
     );
+    if (insertErr) throw insertErr;
+
+    // 2. Delete the invitation
+    const { error: delErr } = await this.supabase
+      .from('board_invitations')
+      .delete()
+      .eq('id', invitationId);
+    if (delErr) throw delErr;
+  }
+
+  async declineInvitation(invitationId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('board_invitations')
+      .delete()
+      .eq('id', invitationId);
     if (error) throw error;
   }
 
@@ -493,28 +600,24 @@ export class SupabaseService {
    */
   subscribeToBoardChanges(boardId: string, callback: () => void): RealtimeChannel {
     const channel = this.supabase
-      .channel(`board-${boardId}`)
+      .channel(`board-${boardId}-${this.sessionId}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'cards' },
-        callback
-      )
-      .on(
-        'postgres_changes',
+        // columns has board_id — safe filter
         { event: '*', schema: 'public', table: 'columns', filter: `board_id=eq.${boardId}` },
         callback
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'subtasks' },
-        callback
-      )
-      .on(
-        'postgres_changes',
+        // activity_logs has board_id — safe filter
         { event: '*', schema: 'public', table: 'activity_logs', filter: `board_id=eq.${boardId}` },
         callback
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.warn(`[Realtime board-${boardId}] subscription status: ${status}`, err);
+        }
+      });
 
     return channel;
   }
