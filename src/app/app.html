@@ -121,7 +121,7 @@
       We-Kan
     </div>
     <div>
-      @if (viewMode() === 'board') {
+      @if (viewMode() === 'board' && router.url.startsWith('/boards')) {
       <div style="display:flex;align-items:center;gap:12px;margin-left:40px;">
         <button class="back-to-boards-btn" (click)="goBackToList()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -155,17 +155,17 @@
       </div>
       } @else {
       <h1 class="app-title">
-        {{ router.url.startsWith('/boards') ? 'Boards' : 'Dashboard' }}
+        {{ router.url.startsWith('/boards') ? 'Boards' : (router.url.startsWith('/profile') ? 'Profile' : 'Dashboard') }}
       </h1>
       <p class="app-subtitle">
-        {{ router.url.startsWith('/boards') ? 'View your projects and manage your boards.' : 'Select a board to open' }}
+        {{ router.url.startsWith('/boards') ? 'View your projects and manage your boards.' : (router.url.startsWith('/profile') ? 'Manage your account and preferences.' : 'Select a board to open') }}
       </p>
       }
     </div>
   </div>
 
     <nav class="app-navbar">
-      @if (viewMode() === 'board') {
+      @if (viewMode() === 'board' && router.url.startsWith('/boards')) {
       @if (isOwner()) {
       <button class="board-nav-tool" (click)="openInviteModal()" title="Members">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
