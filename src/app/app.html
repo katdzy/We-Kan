@@ -153,13 +153,6 @@
         }
 
       </div>
-      } @else {
-      <h1 class="app-title">
-        {{ router.url.startsWith('/boards') ? 'Boards' : (router.url.startsWith('/profile') ? 'Profile' : 'Dashboard') }}
-      </h1>
-      <p class="app-subtitle">
-        {{ router.url.startsWith('/boards') ? 'View your projects and manage your boards.' : (router.url.startsWith('/profile') ? 'Manage your account and preferences.' : 'Select a board to open') }}
-      </p>
       }
     </div>
   </div>
