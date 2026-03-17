@@ -37,7 +37,7 @@ html, body {
 /* ── Theme background images (must be global to apply to body) ── */
 body.theme-noir {
   background-color: #000000;
-  background-image: url('/bg/Noir.jpg');
+  background-image: url('/bg/noir.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -53,7 +53,7 @@ body.theme-mon-cheri {
 
 body.theme-cotton-candy {
   background-color: #fce4ec;
-  background-image: url('/bg/cotton-candy.jpeg');
+  background-image: url('/bg/cotton-candy.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -61,7 +61,7 @@ body.theme-cotton-candy {
 
 body.theme-starry-night {
   background-color: #0d1b4b;
-  background-image: url('/bg/starry-night.jpg');
+  background-image: url('/bg/starry-night.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -110,7 +110,7 @@ body.theme-cotton-candy .card-title { color: #1a1a2e !important; }
 body.theme-cotton-candy .column-title { color: #1a1a2e !important; }
 body.theme-cotton-candy .column-count { background: #fce4ec !important; color: #e91e8c !important; }
 body.theme-cotton-candy .back-to-boards-btn { background: #A8DCD9 !important; border-color: #000 !important; color: #000 !important; }
-body.theme-cotton-candy .back-to-boards-btn:hover { background: #e91e8c !important; color: #ffffff !important; border-color: #000 !important; box-shadow: 2px 2px 0px 0px #000, 6px 6px 0px 0px #000 !important; }
+body.theme-cotton-candy .back-to-boards-btn:hover { background: #e91e8c !important; color: #ffffff !important; border-color: #000 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #000 !important; }
 
 /* ──────────────────────────────────────────────────────────
    NOIR THEME
@@ -148,7 +148,7 @@ body.theme-noir .add-card-btn { background: #000 !important; border-color: #555 
 body.theme-noir .empty-drop-zone { border-color: #444 !important; color: #666 !important; }
 body.theme-noir .add-card-bottom-btn { color: #aaa !important; }
 body.theme-noir .back-to-boards-btn { background: #111 !important; border-color: #fff !important; color: #fff !important; }
-body.theme-noir .back-to-boards-btn:hover { background: #ffffff !important; color: #000 !important; border-color: #ffffff !important; box-shadow: 2px 2px 0px 0px #ffffff, 6px 6px 0px 0px #ffffff !important; }
+body.theme-noir .back-to-boards-btn:hover { background: #ffffff !important; color: #000 !important; border-color: #ffffff !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #ffffff !important; }
 
 /* ──────────────────────────────────────────────────────────
    STARRY NIGHT THEME
@@ -187,7 +187,7 @@ body.theme-starry-night .column-title { color: #191939 !important; }
 body.theme-starry-night .column-count { background: #ECB44D !important; color: #191939 !important; }
 body.theme-starry-night .empty-drop-zone { border-color: #6FB8E6 !important; color: #1B3A68 !important; }
 body.theme-starry-night .back-to-boards-btn { background: #F2E199 !important; border-color: #1B3A68 !important; color: #191939 !important; }
-body.theme-starry-night .back-to-boards-btn:hover { background: #1B3A68 !important; color: #F2E199 !important; border-color: #191939 !important; box-shadow: 2px 2px 0px 0px #191939, 6px 6px 0px 0px #191939 !important; }
+body.theme-starry-night .back-to-boards-btn:hover { background: #1B3A68 !important; color: #F2E199 !important; border-color: #191939 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #191939 !important; }
 
 /* ──────────────────────────────────────────────────────────
    MON CHERI THEME
@@ -226,7 +226,7 @@ body.theme-mon-cheri .column-title { color: #3D0D11 !important; }
 body.theme-mon-cheri .column-count { background: #FFBEC5 !important; color: #3D0D11 !important; }
 body.theme-mon-cheri .empty-drop-zone { border-color: #FFBEC5 !important; color: #7E0F0D !important; }
 body.theme-mon-cheri .back-to-boards-btn { background: #FFF4EB !important; border-color: #7E0F0D !important; color: #7E0F0D !important; }
-body.theme-mon-cheri .back-to-boards-btn:hover { background: #7E0F0D !important; color: #FFF4EB !important; border-color: #3D0D11 !important; box-shadow: 2px 2px 0px 0px #3D0D11, 6px 6px 0px 0px #3D0D11 !important; }
+body.theme-mon-cheri .back-to-boards-btn:hover { background: #7E0F0D !important; color: #FFF4EB !important; border-color: #3D0D11 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #3D0D11 !important; }
 
 /* ── Add Card Button, Icon Buttons ── per theme ─────────────────────── */
 
@@ -236,7 +236,7 @@ body.theme-cotton-candy .add-card-btn:hover { background: #D67AB1 !important; co
 body.theme-cotton-candy .add-card-bottom-btn { color: #D67AB1 !important; }
 body.theme-cotton-candy .add-card-bottom-btn:hover { color: #60435F !important; }
 body.theme-cotton-candy .header-icon-btn { color: #60435F !important; border-color: transparent !important; }
-body.theme-cotton-candy .header-icon-btn:hover { background: #D67AB1 !important; color: #fff !important; border-color: #60435F !important; box-shadow: 2px 2px 0px 0px #60435F !important; }
+body.theme-cotton-candy .header-icon-btn:hover { background: #D67AB1 !important; color: #fff !important; border-color: #60435F !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #60435F !important; }
 body.theme-cotton-candy .col-todo .column-dot       { background: #A8DCD9 !important; }
 body.theme-cotton-candy .col-inprogress .column-dot { background: #D67AB1 !important; }
 body.theme-cotton-candy .col-toreview .column-dot   { background: #E2A3C7 !important; }
@@ -251,7 +251,7 @@ body.theme-starry-night .add-card-btn:hover { background: #ECB44D !important; co
 body.theme-starry-night .add-card-bottom-btn { color: #ECB44D !important; }
 body.theme-starry-night .add-card-bottom-btn:hover { color: #F2E199 !important; }
 body.theme-starry-night .header-icon-btn { color: #F2E199 !important; border-color: transparent !important; }
-body.theme-starry-night .header-icon-btn:hover { background: #ECB44D !important; color: #191939 !important; border-color: #191939 !important; box-shadow: 2px 2px 0px 0px #191939 !important; }
+body.theme-starry-night .header-icon-btn:hover { background: #ECB44D !important; color: #191939 !important; border-color: #191939 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #191939 !important; }
 body.theme-starry-night .col-todo .column-dot       { background: #6FB8E6 !important; }
 body.theme-starry-night .col-inprogress .column-dot { background: #ECB44D !important; }
 body.theme-starry-night .col-toreview .column-dot   { background: #6FB8E6 !important; }
@@ -266,7 +266,7 @@ body.theme-mon-cheri .add-card-btn:hover { background: #7E0F0D !important; color
 body.theme-mon-cheri .add-card-bottom-btn { color: #7E0F0D !important; }
 body.theme-mon-cheri .add-card-bottom-btn:hover { color: #3D0D11 !important; }
 body.theme-mon-cheri .header-icon-btn { color: #7E0F0D !important; border-color: transparent !important; }
-body.theme-mon-cheri .header-icon-btn:hover { background: #7E0F0D !important; color: #FFF4EB !important; border-color: #3D0D11 !important; box-shadow: 2px 2px 0px 0px #3D0D11 !important; }
+body.theme-mon-cheri .header-icon-btn:hover { background: #7E0F0D !important; color: #FFF4EB !important; border-color: #3D0D11 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #3D0D11 !important; }
 body.theme-mon-cheri .col-todo .column-dot       { background: #7E0F0D !important; }
 body.theme-mon-cheri .col-inprogress .column-dot { background: #FFBEC5 !important; }
 body.theme-mon-cheri .col-toreview .column-dot   { background: #7E0F0D !important; }
@@ -275,5 +275,13 @@ body.theme-mon-cheri .card-tag { background: #3D0D11 !important; color: #FFF4EB 
 body.theme-mon-cheri .card-edit-btn { color: #7E0F0D !important; }
 body.theme-mon-cheri .card-edit-btn:hover { color: #3D0D11 !important; }
 
+/* Noir */
+body.theme-noir .header-icon-btn { color: #ffffff !important; border-color: transparent !important; }
+body.theme-noir .header-icon-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #ffffff !important; }
+
+/* ── Universal: Notification bell + 3-dots white in ALL themes ── */
+body[class*="theme-"] .notifications-btn { color: #ffffff !important; }
+body[class*="theme-"] .notifications-btn:hover { color: #ffffff !important; }
+body[class*="theme-"] .header-icon-btn { color: #ffffff !important; }
 
 

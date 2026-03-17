@@ -957,9 +957,10 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  private applyTheme(key: ThemeKey) {
+  private applyTheme(key: ThemeKey | string) {
     const cl = document.body.classList;
     cl.remove('theme-noir', 'theme-mon-cheri', 'theme-cotton-candy', 'theme-starry-night');
-    if (key !== 'default') cl.add(`theme-${key}`);
+    const safeKey = key && key !== 'default' ? key.toLowerCase().replace(' ', '-') : 'default';
+    if (safeKey !== 'default') cl.add(`theme-${safeKey}`);
   }
 }
