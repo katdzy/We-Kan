@@ -112,6 +112,9 @@ body.theme-cotton-candy .column-count { background: #fce4ec !important; color: #
 body.theme-cotton-candy .back-to-boards-btn { background: #A8DCD9 !important; border-color: #000 !important; color: #000 !important; }
 body.theme-cotton-candy .back-to-boards-btn:hover { background: #e91e8c !important; color: #ffffff !important; border-color: #000 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #000 !important; }
 
+body.theme-cotton-candy .bhp-fill { background-color: #e91e8c !important; }
+body.theme-cotton-candy .bhp-percent { color: #e91e8c !important; }
+
 /* ──────────────────────────────────────────────────────────
    NOIR THEME
    ────────────────────────────────────────────────────────── */
@@ -149,6 +152,9 @@ body.theme-noir .empty-drop-zone { border-color: #444 !important; color: #666 !i
 body.theme-noir .add-card-bottom-btn { color: #aaa !important; }
 body.theme-noir .back-to-boards-btn { background: #111 !important; border-color: #fff !important; color: #fff !important; }
 body.theme-noir .back-to-boards-btn:hover { background: #ffffff !important; color: #000 !important; border-color: #ffffff !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #ffffff !important; }
+
+body.theme-noir .bhp-fill { background-color: #ffffff !important; }
+body.theme-noir .bhp-percent { color: #ffffff !important; }
 
 /* ──────────────────────────────────────────────────────────
    STARRY NIGHT THEME
@@ -189,6 +195,9 @@ body.theme-starry-night .empty-drop-zone { border-color: #6FB8E6 !important; col
 body.theme-starry-night .back-to-boards-btn { background: #F2E199 !important; border-color: #1B3A68 !important; color: #191939 !important; }
 body.theme-starry-night .back-to-boards-btn:hover { background: #1B3A68 !important; color: #F2E199 !important; border-color: #191939 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #191939 !important; }
 
+body.theme-starry-night .bhp-fill { background-color: #ffd600 !important; }
+body.theme-starry-night .bhp-percent { color: #ffd600 !important; }
+
 /* ──────────────────────────────────────────────────────────
    MON CHERI THEME
    ────────────────────────────────────────────────────────── */
@@ -227,6 +236,9 @@ body.theme-mon-cheri .column-count { background: #FFBEC5 !important; color: #3D0
 body.theme-mon-cheri .empty-drop-zone { border-color: #FFBEC5 !important; color: #7E0F0D !important; }
 body.theme-mon-cheri .back-to-boards-btn { background: #FFF4EB !important; border-color: #7E0F0D !important; color: #7E0F0D !important; }
 body.theme-mon-cheri .back-to-boards-btn:hover { background: #7E0F0D !important; color: #FFF4EB !important; border-color: #3D0D11 !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #3D0D11 !important; }
+
+body.theme-mon-cheri .bhp-fill { background-color: #ffffff !important; }
+body.theme-mon-cheri .bhp-percent { color: #fdf6ee !important; }
 
 /* ── Add Card Button, Icon Buttons ── per theme ─────────────────────── */
 
@@ -278,10 +290,3 @@ body.theme-mon-cheri .card-edit-btn:hover { color: #3D0D11 !important; }
 /* Noir */
 body.theme-noir .header-icon-btn { color: #ffffff !important; border-color: transparent !important; }
 body.theme-noir .header-icon-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; transform: translate(-2px, -2px) !important; box-shadow: 4px 4px 0px 0px #ffffff !important; }
-
-/* ── Universal: Notification bell + 3-dots white in ALL themes ── */
-body[class*="theme-"] .notifications-btn { color: #ffffff !important; }
-body[class*="theme-"] .notifications-btn:hover { color: #ffffff !important; }
-body[class*="theme-"] .header-icon-btn { color: #ffffff !important; }
-
-
