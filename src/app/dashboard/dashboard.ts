@@ -42,4 +42,3 @@ export class Dashboard implements OnInit {
     this.router.navigate(['/boards'], { queryParams: { boardId } });
   }
 }
- 
