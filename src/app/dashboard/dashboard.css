@@ -310,4 +310,121 @@
   font-weight: bold;
 }
 
-/* placeholder */
+
+/* ════════════════════════════════════════════════════════════════
+   PER-CARD THEME OVERRIDES — dashboard board cards
+   Only thumbnail (.board-card-top), progress fill (.progress-bar-neo),
+   view button (.view-board-btn-neo), and percent (.progress-percent-neo)
+   change color. The bottom half stays white and border/shadow stay black.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Mon Cheri: Maroon ── */
+.board-card-neo.theme-mon-cheri .board-card-top {
+  background-color: #6b0f1a !important;
+}
+
+.board-card-neo.theme-mon-cheri .progress-bar-neo {
+  background-color: #6b0f1a !important;
+}
+
+.board-card-neo.theme-mon-cheri .view-board-btn-neo {
+  background-color: #6b0f1a !important;
+  color: #ffffff !important;
+  border-color: #000000;
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.board-card-neo.theme-mon-cheri .progress-percent-neo {
+  color: #6b0f1a !important;
+}
+
+/* ── Starry Night: Blue ── */
+.board-card-neo.theme-starry-night .board-card-top {
+  background-color: #1a237e !important;
+}
+
+.board-card-neo.theme-starry-night .progress-bar-neo {
+  background-color: #1a237e !important;
+}
+
+.board-card-neo.theme-starry-night .view-board-btn-neo {
+  background-color: #1a237e !important;
+  color: #ffffff !important;
+  border-color: #000000;
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.board-card-neo.theme-starry-night .progress-percent-neo {
+  color: #1a237e !important;
+}
+
+/* ── Noir: Black thumbnail/fill/btn; grey border+shadow; white bottom ── */
+.board-card-neo.theme-noir {
+  border-color: #2a2a2a !important;
+  box-shadow: 5px 5px 0px #2a2a2a !important;
+}
+
+.board-card-neo.theme-noir:hover {
+  box-shadow: 8px 8px 0px #2a2a2a !important;
+}
+
+.board-card-neo.theme-noir .board-card-top {
+  background-color: #000000 !important;
+  border-bottom-color: #2a2a2a;
+}
+
+.board-card-neo.theme-noir .progress-bar-neo {
+  background-color: #ffffff !important;
+}
+
+.board-card-neo.theme-noir .view-board-btn-neo {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #2a2a2a !important;
+  box-shadow: 3px 3px 0px #2a2a2a !important;
+}
+
+.board-card-neo.theme-noir .view-board-btn-neo:hover {
+  background-color: #222222 !important;
+  box-shadow: 4px 4px 0px #2a2a2a !important;
+}
+
+.board-card-neo.theme-noir .progress-percent-neo {
+  color: #ffffff !important;
+}
+
+/* Noir ellipsis button: inverted */
+.board-card-neo.theme-noir .bnc-dots-btn {
+  background: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 2px 2px 0px #ffffff !important;
+}
+
+.board-card-neo.theme-cotton-candy {
+  border: 2px solid #000000 !important;
+  box-shadow: 5px 5px 0px #000000 !important;
+}
+
+.board-card-neo.theme-cotton-candy .board-card-top {
+  background-color: #e91e8c !important;
+}
+
+.board-card-neo.theme-cotton-candy .progress-container-neo {
+  background: #000000 !important;
+}
+
+.board-card-neo.theme-cotton-candy .progress-bar-neo {
+  background-color: #e91e8c !important;
+}
+
+.board-card-neo.theme-cotton-candy .view-board-btn-neo {
+  background-color: #e91e8c !important;
+  color: #ffffff !important;
+  border-color: #000000;
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.board-card-neo.theme-cotton-candy .progress-percent-neo {
+  color: #e91e8c !important;
+}
