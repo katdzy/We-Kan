@@ -24,8 +24,8 @@
         <div class="no-boards">No boards found.</div>
         } @else {
         @for (board of recentBoards(); track board.id) {
-        <div class="board-card-neo" (click)="navigateToBoard(board.id)">
-          <div class="board-card-top" [style.backgroundColor]="board.color || '#F97316'">
+        <div class="board-card-neo" (click)="navigateToBoard(board.id)" [ngClass]="'theme-' + (board.theme && board.theme !== 'default' ? board.theme.toLowerCase().replace(' ', '-') : 'default')">
+          <div class="board-card-top" [style.backgroundColor]="board.theme && board.theme !== 'default' ? null : (board.color || '#F97316')">
             <h4 class="board-title-neo">{{ board.title }}</h4>
             <div class="board-type-tag" [class.group-board]="(board.member_count ?? 1) > 1">
               {{ (board.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
@@ -37,13 +37,13 @@
                 <span class="progress-label-neo">Progress Summary</span>
                 <div class="progress-container-neo">
                   <div class="progress-bar-neo" [style.width.%]="board.progress"
-                    [style.backgroundColor]="board.color || '#F97316'"></div>
+                    [style.backgroundColor]="board.theme && board.theme !== 'default' ? null : (board.color || '#F97316')"></div>
                 </div>
               </div>
-              <span class="progress-percent-neo" [style.color]="board.color || '#F97316'">{{ board.progress }}%</span>
+              <span class="progress-percent-neo" [style.color]="board.theme && board.theme !== 'default' ? null : (board.color || '#F97316')">{{ board.progress }}%</span>
             </div>
             <div class="view-btn-container">
-              <button class="view-board-btn-neo" [style.backgroundColor]="board.color || '#F97316'">View</button>
+              <button class="view-board-btn-neo" [style.backgroundColor]="board.theme && board.theme !== 'default' ? null : (board.color || '#F97316')">View</button>
             </div>
           </div>
         </div>
