@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, OnInit, OnDestroy, effect } from '
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterOutlet, Router, RouterLinkActive, ActivatedRoute } from '@angular/router';
+import { RouterLink, RouterOutlet, Router, RouterLinkActive, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { SupabaseService, ActivityLog, BoardMember, BoardInvitation } from './supabase.service';
 import { AuthService } from './auth.service';
 
@@ -219,6 +219,18 @@ export class App implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        // If we leave the /boards completely, tear down the realtime sub 
+        // so it doesn't fire background updates and re-apply themes.
+        if (!event.urlAfterRedirects.startsWith('/boards')) {
+          this.teardownRealtimeSubscription();
+          this.activeBoard.set(null);
+          this.viewMode.set('list');
+        }
+      }
+    });
+
     this.route.queryParams.subscribe(params => {
       const boardId = params['boardId'];
       if (boardId && this.authService.session()) {
