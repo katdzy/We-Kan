@@ -523,9 +523,9 @@
 } @else {
 <div class="boards-cards-grid">
   @for (board of accessibleBoards(); track board.id) {
-  <div class="board-neo-card" [class.menu-open]="openBoardMenuId() === board.id">
+  <div class="board-neo-card" [class.menu-open]="openBoardMenuId() === board.id" [ngClass]="'theme-' + (board.theme && board.theme !== 'default' ? board.theme.toLowerCase().replace(' ', '-') : 'default')">
     <!-- Card Preview Top -->
-    <div class="bnc-preview" [style.background]="board.color || '#BDF522'">
+    <div class="bnc-preview" [style.background]="board.theme && board.theme !== 'default' ? null : (board.color || '#BDF522')">
       <h3 class="bnc-preview-title">{{ board.title }}</h3>
       <div class="board-type-tag" [class.group-board]="(board.member_count ?? 1) > 1">
         {{ (board.member_count ?? 1) > 1 ? 'Group' : 'Personal' }}
@@ -557,13 +557,13 @@
           <span class="bnc-progress-label">Progress Summary</span>
           <div class="bnc-progress-track">
             <div class="bnc-progress-fill" [style.width.%]="board.progress"
-              [style.background]="board.color || '#BDF522'"></div>
+              [style.background]="board.theme && board.theme !== 'default' ? null : (board.color || '#BDF522')"></div>
           </div>
         </div>
-        <span class="bnc-percent" [style.color]="board.color || '#BDF522'">{{ board.progress }}%</span>
+        <span class="bnc-percent" [style.color]="board.theme && board.theme !== 'default' ? null : (board.color || '#BDF522')">{{ board.progress }}%</span>
       </div>
       <div class="bnc-footer">
-        <button class="bnc-view-btn" [style.background]="board.color || '#BDF522'" (click)="selectBoard(board.id)">
+        <button class="bnc-view-btn" [style.background]="board.theme && board.theme !== 'default' ? null : (board.color || '#BDF522')" (click)="selectBoard(board.id)">
           View
         </button>
       </div>
@@ -582,10 +582,10 @@
 
   <div class="board-header-progress">
     <div class="bhp-track">
-      <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.color || '#BDF522'">
+      <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522')">
       </div>
     </div>
-    <span class="bhp-percent" [style.color]="activeBoard()?.color || '#BDF522'">{{ boardProgress() }}%</span>
+    <span class="bhp-percent" [style.color]="activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522')">{{ boardProgress() }}%</span>
   </div>
 </div>
 <div class="board">
