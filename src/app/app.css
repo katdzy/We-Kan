@@ -3645,20 +3645,7 @@ body.theme-noir .column-accent-bar {
   background: #ffffff !important;
 }
 
-body.theme-noir .bnc-preview,
-body.theme-noir .bnc-progress-track,
-body.theme-noir .bnc-view-btn {
-  background-color: #ffffff !important;
-}
 
-body.theme-noir .bnc-percent {
-  color: #ffffff !important;
-}
-
-body.theme-noir .board-card-neo {
-  border: 2px solid #ffffff !important;
-  box-shadow: 6px 6px 0px #000000 !important;
-}
 
 body.theme-noir .column-count {
   background: #ffffff !important;
@@ -3750,54 +3737,7 @@ body.theme-noir .card-divider {
   border-color: #222222;
 }
 
-body.theme-noir .board-neo-card {
-  background: #0a0a0a !important;
-  border-color: #ffffff !important;
-  box-shadow: 5px 5px 0px #ffffff !important;
-}
 
-body.theme-noir .board-neo-card:hover {
-  box-shadow: 8px 8px 0px #ffffff;
-}
-
-body.theme-noir .bnc-info {
-  background: #0a0a0a !important;
-}
-
-body.theme-noir .bnc-title {
-  color: #ffffff !important;
-}
-
-body.theme-noir .board-type-tag {
-  background: #ffffff !important;
-  color: #000000 !important;
-}
-
-body.theme-noir .bnc-progress-label {
-  color: #aaaaaa;
-}
-
-body.theme-noir .bnc-progress-track {
-  background: #333333;
-}
-
-body.theme-noir .bnc-percent {
-  -webkit-text-stroke-color: #555;
-}
-
-body.theme-noir .bnc-view-btn {
-  background: #000000 !important;
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-  box-shadow: 2px 2px 0px #ffffff !important;
-}
-
-body.theme-noir .bnc-view-btn:hover {
-  background: #ffffff !important;
-  color: #000000 !important;
-  transform: translate(-2px, -2px) !important;
-  box-shadow: 4px 4px 0px #ffffff !important;
-}
 
 body.theme-noir .add-board-btn {
   background: #000000;
@@ -4048,54 +3988,7 @@ body.theme-noir .neo-empty-state {
   color: #aaaaaa !important;
 }
 
-/* ── Noir: Board Card Preview ── */
-body.theme-noir .bnc-preview,
-.theme-noir .bnc-preview,
-body.theme-noir .bnc-progress-track,
-.theme-noir .bnc-progress-track,
-body.theme-noir .bnc-view-btn,
-.theme-noir .bnc-view-btn,
-.theme-noir .bhp-fill {
-  background-color: #000000 !important;
-}
 
-body.theme-noir .bnc-percent,
-.theme-noir .bnc-percent,
-.theme-noir .bhp-percent {
-  color: #ffffff !important;
-}
-
-body.theme-noir .board-neo-card,
-.board-neo-card.theme-noir {
-  background: #111111 !important;
-  border-color: #ffffff !important;
-  box-shadow: 5px 5px 0px #ffffff !important;
-}
-
-.theme-noir .bnc-preview-title {
-  color: #ffffff !important;
-}
-
-.theme-noir .board-type-tag {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
-  box-shadow: 2px 2px 0px #ffffff !important;
-}
-
-.theme-noir .bnc-view-btn {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
-}
-
-.theme-noir .bnc-progress-fill {
-  background: #ffffff !important;
-}
-
-.theme-noir .bnc-progress-label {
-  color: #ffffff !important;
-}
 
 /* ── Noir: Add New Board Button ── */
 body.theme-noir .add-new-board-btn {
@@ -4292,45 +4185,7 @@ body.theme-mon-cheri .board-neo-card:hover,
   color: #fdf6ee !important;
 }
 
-.theme-mon-cheri .board-type-tag {
-  background: #fdf6ee !important;
-  color: #3d0000 !important;
-  border-color: #000000 !important;
-  box-shadow: 2px 2px 0px #000000 !important;
-}
 
-.theme-mon-cheri .bnc-view-btn {
-  background: #3d0000 !important;
-  color: #fdf6ee !important;
-  border-color: #000000 !important;
-  box-shadow: 2px 2px 0px #000000 !important;
-}
-
-.theme-mon-cheri .bnc-view-btn:hover {
-  background: #fdf6ee !important;
-  color: #3d0000 !important;
-  border-color: #000000 !important;
-  box-shadow: 4px 4px 0px #fdf6ee !important;
-}
-
-.theme-mon-cheri .bnc-progress-fill {
-  background: #fdf6ee !important;
-}
-
-.theme-mon-cheri .bnc-progress-label {
-  color: #fdf6ee !important;
-}
-
-.theme-mon-cheri .bnc-dots-btn {
-  background: #3d0000 !important;
-  border-color: #fdf6ee !important;
-  color: #fdf6ee !important;
-  box-shadow: 2px 2px 0px #000000 !important;
-}
-
-.theme-mon-cheri .bnc-dots-btn:hover {
-  box-shadow: 4px 4px 0px #fdf6ee !important;
-}
 
 body.theme-mon-cheri {
   background-color: #1a0505 !important;
@@ -4880,21 +4735,7 @@ body.theme-cotton-candy .board-neo-card,
   color: #ffffff !important;
 }
 
-.theme-cotton-candy .board-type-tag {
-  color: #ffffff !important;
-  background: #000000 !important;
-  border-color: #000000 !important;
-}
 
-.theme-cotton-candy .bnc-view-btn {
-  background: #e91e8c !important;
-  color: #ffffff !important;
-  border-color: #e91e8c !important;
-}
-
-.theme-cotton-candy .bnc-progress-fill {
-  background: #e91e8c !important;
-}
 
 body.theme-cotton-candy {
   background-color: #fce4ec !important;
@@ -5370,26 +5211,7 @@ body.theme-starry-night .card-divider {
   border-color: #c5cae9;
 }
 
-body.theme-starry-night .board-neo-card {
-  background: #f5f0e8 !important;
-  border-color: #1a237e;
-  box-shadow: 5px 5px 0px #091536;
-}
 
-body.theme-starry-night .board-neo-card:hover {
-  box-shadow: 8px 8px 0px #091536;
-}
-
-body.theme-starry-night .bnc-info {
-  background: #f5f0e8;
-}
-
-body.theme-starry-night .bnc-view-btn {
-  background: #1a237e !important;
-  color: #ffd600 !important;
-  border-color: #091536;
-  box-shadow: 3px 3px 0px #091536;
-}
 
 body.theme-starry-night .add-board-btn {
   background: #ffd600;
@@ -5479,123 +5301,135 @@ body.theme-starry-night .panel-close-btn {
   color: #ffd600;
 }
 
-/* ── Noir: Dark card info section ── */
-.theme-noir .bnc-info {
-  background: #111111 !important;
+
+/* ════════════════════════════════════════════════════════════════
+   PER-CARD THEME OVERRIDES — Boards page + Dashboard board cards
+   ─────────────────────────────────────────────────────────────
+   CONSTANTS (same across all themes):
+     • Card bottom half (.bnc-info) → white bg, black text
+     • Card border + drop shadow → black (grey for Noir)
+     • Board title → white text, black stroke  (set in base CSS)
+     • Type tag → white bg, black text, black border (set in base CSS)
+     • Ellipsis btn → white bg, black border/dots (inverted for Noir)
+
+   DYNAMIC (changes per theme):
+     • Thumbnail bg (.bnc-preview / .board-card-top)
+     • Progress bar fill (.bnc-progress-fill / .progress-bar-neo)
+     • View button (.bnc-view-btn / .view-board-btn-neo)
+   ════════════════════════════════════════════════════════════════ */
+
+/* ─── Base card constants (white bottom, black border) ─────── */
+.board-neo-card .bnc-info {
+  background: #ffffff !important;
 }
 
-.theme-noir .bnc-dots-btn {
-  background: #333333 !important;
-  border-color: #ffffff !important;
+.board-neo-card .bnc-progress-label {
+  color: #000000 !important;
+}
+
+/* Ellipsis / dots button default (most themes: white bg, black dots) */
+.board-neo-card .bnc-dots-btn {
+  background: #ffffff !important;
+  border: 1.5px solid #000000 !important;
+  color: #000000 !important;
+  box-shadow: 2px 2px 0px #000000 !important;
+}
+
+/* ─── Mon Cheri: Maroon ─────────────────────────────────────── */
+.theme-mon-cheri .bnc-preview {
+  background-color: #6b0f1a !important;
+}
+
+.theme-mon-cheri .bnc-progress-fill {
+  background-color: #6b0f1a !important;
+}
+
+.theme-mon-cheri .bnc-view-btn {
+  background-color: #6b0f1a !important;
   color: #ffffff !important;
-  box-shadow: 2px 2px 0px #333333 !important;
+  border-color: #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
 }
 
-/* ── Noir: Fix card shadow (dark, not white) ── */
-body.theme-noir .board-neo-card,
-.board-neo-card.theme-noir {
-  box-shadow: 5px 5px 0px #333333 !important;
-  border-color: #444444 !important;
+.theme-mon-cheri .bnc-view-btn:hover {
+  background-color: #4a0910 !important;
+  box-shadow: 4px 4px 0px #000000 !important;
 }
 
-body.theme-noir .board-neo-card:hover,
-.board-neo-card.theme-noir:hover {
-  box-shadow: 8px 8px 0px #333333 !important;
+.theme-mon-cheri .bnc-percent {
+  color: #6b0f1a !important;
 }
 
-/* ── Starry Night: Board Card (individual cards in grid) ── */
-.board-neo-card.theme-starry-night {
-  background: #0d1b4b !important;
-  border-color: #ffd600 !important;
-  box-shadow: 5px 5px 0px #091536 !important;
-}
-
-.board-neo-card.theme-starry-night:hover {
-  box-shadow: 8px 8px 0px #091536 !important;
-}
-
+/* ─── Starry Night: Blue ────────────────────────────────────── */
 .theme-starry-night .bnc-preview {
   background-color: #1a237e !important;
 }
 
-.theme-starry-night .bnc-preview-title {
-  color: #ffd600 !important;
-  -webkit-text-stroke-color: #091536 !important;
-}
-
-.theme-starry-night .board-type-tag {
-  background: #ffd600 !important;
-  color: #1a237e !important;
-  border-color: #ffd600 !important;
-  box-shadow: 2px 2px 0px #091536 !important;
-}
-
-.theme-starry-night .bnc-info {
-  background: #0d1b4b !important;
-}
-
-.theme-starry-night .bnc-progress-label {
-  color: #ffd600 !important;
-}
-
-.theme-starry-night .bnc-progress-track {
-  background: #091536 !important;
-}
-
 .theme-starry-night .bnc-progress-fill {
-  background: #ffd600 !important;
-}
-
-.theme-starry-night .bnc-percent {
-  color: #ffd600 !important;
-  -webkit-text-stroke-color: #091536 !important;
+  background-color: #1a237e !important;
 }
 
 .theme-starry-night .bnc-view-btn {
-  background: #ffd600 !important;
-  color: #1a237e !important;
-  border-color: #091536 !important;
-  box-shadow: 2px 2px 0px #091536 !important;
+  background-color: #1a237e !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
 }
 
 .theme-starry-night .bnc-view-btn:hover {
-  background: #1a237e !important;
-  color: #ffd600 !important;
-  box-shadow: 3px 3px 0px #091536 !important;
+  background-color: #0d1257 !important;
+  box-shadow: 4px 4px 0px #000000 !important;
 }
 
-body.theme-starry-night .header-icon-btn,
-body.theme-starry-night .notifications-btn {
-  color: #ffd600 !important;
-  border-color: #ffd600 !important;
+.theme-starry-night .bnc-percent {
+  color: #1a237e !important;
 }
 
-body.theme-starry-night .notifications-btn {
-  background-color: #0d1b4b !important;
-  box-shadow: 2px 2px 0 #ffd600 !important;
+/* ─── Noir: Black thumbnail/fill/btn; grey border+shadow ────── */
+.board-neo-card.theme-noir {
+  border-color: #2a2a2a !important;
+  box-shadow: 5px 5px 0px #2a2a2a !important;
 }
 
-body.theme-starry-night .notifications-btn:hover,
-body.theme-starry-night .header-icon-btn:hover {
-  background-color: #1a237e !important;
+.board-neo-card.theme-noir:hover {
+  box-shadow: 8px 8px 0px #2a2a2a !important;
+}
+
+.theme-noir .bnc-preview {
+  background-color: #000000 !important;
+  border-bottom-color: #2a2a2a !important;
+}
+
+.theme-noir .bnc-progress-fill {
+  background-color: #ffffff !important;
+}
+
+.theme-noir .bnc-view-btn {
+  background-color: #000000 !important;
   color: #ffffff !important;
-  transform: translate(-2px, -2px) !important;
-  box-shadow: 4px 4px 0 #ffd600 !important;
+  border-color: #2a2a2a !important;
+  box-shadow: 3px 3px 0px #2a2a2a !important;
 }
 
-body.theme-starry-night .header-separator-neo {
-  background: #ffd600 !important;
+.theme-noir .bnc-view-btn:hover {
+  background-color: #222222 !important;
+  box-shadow: 4px 4px 0px #2a2a2a !important;
 }
 
-body.theme-starry-night .header-right {
-  border-left-color: #ffd600 !important;
+.theme-noir .bnc-percent {
+  color: #ffffff !important;
 }
 
-/* ── Cotton Candy: Board Card (individual cards in grid) ── */
+/* Noir: inverted ellipsis btn — black bg, white border/dots */
+.theme-noir .bnc-dots-btn {
+  background: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 2px 2px 0px #ffffff !important;
+}
+
 .board-neo-card.theme-cotton-candy {
-  background: #fdf2f8 !important;
-  /* Very light pink */
-  border-color: #e91e8c !important;
+  border: 2px solid #000000 !important;
   box-shadow: 5px 5px 0px #000000 !important;
 }
 
@@ -5603,81 +5437,26 @@ body.theme-starry-night .header-right {
   background-color: #e91e8c !important;
 }
 
-.theme-cotton-candy .bnc-preview-title {
-  color: #1e40af !important;
-  /* Blue text */
-}
-
-.theme-cotton-candy .bnc-info {
-  background: #fdf2f8 !important;
-}
-
-.theme-cotton-candy .bnc-progress-label {
-  color: #000000 !important;
-}
-
 .theme-cotton-candy .bnc-progress-track {
-  background: #bfdbfe !important;
-  /* Light blue track */
+  background: #000000 !important;
 }
 
 .theme-cotton-candy .bnc-progress-fill {
-  background: #e91e8c !important;
-  /* Pink fill */
-}
-
-.theme-cotton-candy .bnc-percent {
-  color: #e91e8c !important;
+  background-color: #e91e8c !important;
 }
 
 .theme-cotton-candy .bnc-view-btn {
-  background: #1e40af !important;
-  /* Blue background */
+  background-color: #e91e8c !important;
   color: #ffffff !important;
   border-color: #000000 !important;
-  box-shadow: 2px 2px 0px #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
 }
 
 .theme-cotton-candy .bnc-view-btn:hover {
-  background: #e91e8c !important;
-  /* Pink on hover */
-  color: #ffffff !important;
-}
-
-.theme-cotton-candy .bnc-dots-btn {
-  background: #ffffff !important;
-  border-color: #e91e8c !important;
-  color: #e91e8c !important;
-  box-shadow: 2px 2px 0px #000000 !important;
-}
-
-.theme-cotton-candy .bnc-progress-label {
-  color: #000000 !important;
-}
-
-.theme-cotton-candy .bnc-progress-track {
-  background: #A8DCD9 !important;
-}
-
-.theme-cotton-candy .bnc-progress-fill {
-  background: #e91e8c !important;
+  background-color: #c41578 !important;
+  box-shadow: 4px 4px 0px #000000 !important;
 }
 
 .theme-cotton-candy .bnc-percent {
   color: #e91e8c !important;
-  -webkit-text-stroke-color: #000000 !important;
-}
-
-.theme-cotton-candy .bnc-view-btn:hover {
-  background: #A8DCD9 !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
-  box-shadow: 2px 2px 0px #000000 !important;
-}
-
-.theme-cotton-candy .bnc-dots-btn {
-  background: #ffffff !important;
-  border-color: #e91e8c !important;
-  color: #e91e8c !important;
-  box-shadow: 2px 2px 0px #000000 !important;
 }
