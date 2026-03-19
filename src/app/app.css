@@ -4152,9 +4152,12 @@ body.theme-mon-cheri .header-icon-btn:hover {
 body.theme-mon-cheri .bnc-preview,
 .theme-mon-cheri .bnc-preview,
 body.theme-mon-cheri .bnc-view-btn,
-.theme-mon-cheri .bnc-view-btn,
-.theme-mon-cheri .bhp-fill {
+.theme-mon-cheri .bnc-view-btn {
   background-color: #3d0000 !important;
+}
+
+.theme-mon-cheri .bhp-fill {
+  background-color: #ffffff !important;
 }
 
 body.theme-mon-cheri .bnc-progress-track,
