@@ -362,10 +362,10 @@
     </div>
     <div class="board-header-progress">
       <div class="bhp-track">
-        <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522')">
+        <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.theme === 'mon-cheri' ? '#ffffff' : (activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522'))">
         </div>
       </div>
-      <span class="bhp-percent" [style.color]="activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522')">{{ boardProgress() }}%</span>
+      <span class="bhp-percent" [style.color]="activeBoard()?.theme === 'mon-cheri' ? '#ffffff' : (activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522'))">{{ boardProgress() }}%</span>
     </div>
   </div>
   <div class="board">
@@ -582,10 +582,10 @@
 
   <div class="board-header-progress">
     <div class="bhp-track">
-      <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522')">
+      <div class="bhp-fill" [style.width.%]="boardProgress()" [style.background]="activeBoard()?.theme === 'mon-cheri' ? '#ffffff' : (activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522'))">
       </div>
     </div>
-    <span class="bhp-percent" [style.color]="activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522')">{{ boardProgress() }}%</span>
+    <span class="bhp-percent" [style.color]="activeBoard()?.theme === 'mon-cheri' ? '#ffffff' : (activeBoard()?.theme && activeBoard()?.theme !== 'default' ? null : (activeBoard()?.color || '#BDF522'))">{{ boardProgress() }}%</span>
   </div>
 </div>
 <div class="board">
