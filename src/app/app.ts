@@ -224,6 +224,16 @@ export class App implements OnInit, OnDestroy {
         // If we leave the /boards completely, tear down the realtime sub 
         // so it doesn't fire background updates and re-apply themes.
         if (!event.urlAfterRedirects.startsWith('/boards')) {
+          // --- SYNC PROGRESS LOCALLY BEFORE WE LEAVE ---
+          const active = this.activeBoard();
+          if (active) {
+            const currentProgress = this.boardProgress();
+            this.accessibleBoards.update(boards =>
+              boards.map(b => (b.id === active.id ? { ...b, progress: currentProgress } : b))
+            );
+          }
+          // ---------------------------------------------
+
           this.teardownRealtimeSubscription();
           this.activeBoard.set(null);
           this.viewMode.set('list');
@@ -318,6 +328,11 @@ export class App implements OnInit, OnDestroy {
 
       // 1. Resolve accessible boards (also syncs board title)
       const boards = await this.supabase.getAccessibleBoardsWithProgress(user.id);
+      
+      // Abort if the user navigated away from the board while we were fetching data
+      // This prevents background realtime updates from re-applying themes and overwriting activeBoard.
+      if (this.viewMode() !== 'board') return;
+
       this.accessibleBoards.set(boards);
 
       let board = targetBoardId ? boards.find((b: any) => b.id === targetBoardId) : boards[0];
@@ -332,8 +347,12 @@ export class App implements OnInit, OnDestroy {
 
       // 2. Load columns, cards, subtasks
       const cols = await this.supabase.loadBoard(board.id);
+      
+      if (this.viewMode() !== 'board') return;
+
       if (cols.length === 0 && board.owner_id === user.id) {
         const seeded = await this.supabase.seedDefaultColumns(board.id);
+        if (this.viewMode() !== 'board') return;
         this.columns.set(seeded);
       } else {
         this.columns.set(cols);
@@ -450,6 +469,17 @@ export class App implements OnInit, OnDestroy {
 
   /** Returns to the boards list view. */
   goBackToList() {
+    // --- SYNC PROGRESS LOCALLY BEFORE WE LEAVE ---
+    // Instantly commit the latest computed progress into the boards list array right before we clear the kanban context.
+    const active = this.activeBoard();
+    if (active) {
+      const currentProgress = this.boardProgress();
+      this.accessibleBoards.update(boards =>
+        boards.map(b => (b.id === active.id ? { ...b, progress: currentProgress } : b))
+      );
+    }
+    // ---------------------------------------------
+
     this.teardownRealtimeSubscription();
     this.viewMode.set('list');
     this.activeBoard.set(null);
