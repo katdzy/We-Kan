@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../environments/environment';
+import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
 import { Column, Card, Subtask } from './app';
+import { supabaseClient } from './supabase-client';
 
 export interface ActivityLog {
   id: string;
@@ -66,29 +66,7 @@ const DEFAULT_COLUMNS = [
 ];
 
 // ── Service ───────────────────────────────────────────────────────────────────
-// Custom storage that falls back to sessionStorage when localStorage quota is exceeded.
-const safeStorage = {
-  getItem: (key: string): string | null => {
-    try {
-      return localStorage.getItem(key) ?? sessionStorage.getItem(key);
-    } catch {
-      return sessionStorage.getItem(key);
-    }
-  },
-  setItem: (key: string, value: string): void => {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      try {
-        sessionStorage.setItem(key, value);
-      } catch { /* ignore if both fail */ }
-    }
-  },
-  removeItem: (key: string): void => {
-    try { localStorage.removeItem(key); } catch { /* noop */ }
-    try { sessionStorage.removeItem(key); } catch { /* noop */ }
-  },
-};
+// Custom storage imported from safe-storage.ts
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
@@ -97,9 +75,7 @@ export class SupabaseService {
   private readonly sessionId = Math.random().toString(36).slice(2, 8);
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
-      auth: { storage: safeStorage },
-    });
+    this.supabase = supabaseClient;
   }
 
   // ── Load entire board ───────────────────────────────────────────────────────
@@ -500,17 +476,18 @@ export class SupabaseService {
     return members;
   }
 
-  async inviteMember(boardId: string, email: string): Promise<void> {
+  async inviteMember(boardId: string, email: string, boardTitle = '', inviterEmail = ''): Promise<void> {
     const { data: { user } } = await this.supabase.auth.getUser();
     if (!user) throw new Error('Not logged in');
 
-    // Make sure we're not inserting a duplicate invitation
     const { error } = await this.supabase
       .from('board_invitations')
       .insert({
         board_id: boardId,
         inviter_id: user.id,
-        invitee_email: email,
+        inviter_email: inviterEmail || user.email || '',
+        board_title: boardTitle,
+        invitee_email: email.toLowerCase(),
       });
 
     if (error) {
@@ -522,41 +499,23 @@ export class SupabaseService {
   }
 
   async getPendingInvitations(email: string): Promise<BoardInvitation[]> {
-    // We only fetch invitations for this specific email (enforced by RLS)
     const { data, error } = await this.supabase
       .from('board_invitations')
-      .select('id, board_id, inviter_id, invitee_email, created_at, boards(title)')
+      .select('id, board_id, inviter_id, inviter_email, board_title, invitee_email, created_at')
       .eq('invitee_email', email)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    // Fetch inviter emails via RPC for each invite
-    const invites: BoardInvitation[] = [];
-    for (const row of (data ?? [])) {
-      const { data: emailData } = await this.supabase
-        .rpc('get_user_email_by_id', { user_id_input: row.inviter_id });
-
-      let title = 'Unknown Board';
-      if (row.boards) {
-        if (Array.isArray(row.boards)) {
-           title = row.boards[0]?.title ?? 'Unknown Board';
-        } else {
-           title = (row.boards as any).title ?? 'Unknown Board';
-        }
-      }
-
-      invites.push({
-        id: row.id,
-        board_id: row.board_id,
-        inviter_id: row.inviter_id,
-        inviter_email: emailData ?? row.inviter_id,
-        invitee_email: row.invitee_email,
-        created_at: row.created_at,
-        board_title: title,
-      });
-    }
-    return invites;
+    return (data ?? []).map((row: any) => ({
+      id: row.id,
+      board_id: row.board_id,
+      inviter_id: row.inviter_id,
+      inviter_email: row.inviter_email || 'Someone',
+      invitee_email: row.invitee_email,
+      created_at: row.created_at,
+      board_title: row.board_title || 'a board',
+    } as BoardInvitation));
   }
 
   async acceptInvitation(invitationId: string, boardId: string, userId: string): Promise<void> {

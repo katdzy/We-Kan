@@ -206,7 +206,7 @@ export class App implements OnInit, OnDestroy {
       }
     });
 
-    // Poll for pending invitations every 30 seconds
+    // Poll for pending invitations every 10 seconds
     effect(() => {
        const user = this.authService.user();
        if (user && user.email) {
@@ -401,20 +401,20 @@ export class App implements OnInit, OnDestroy {
   // ── Invitations ───────────────────────────────────────────────────────────
   async loadPendingInvitations(email: string) {
     try {
+      console.log('[Invitations] Fetching for email:', email);
       const invites = await this.supabase.getPendingInvitations(email);
+      console.log('[Invitations] Received:', invites.length, invites);
       this.pendingInvitations.set(invites);
     } catch (err) {
-      console.error('Failed to load invitations:', err);
+      console.error('[Invitations] Failed to load invitations:', err);
     }
   }
 
   private startInvitationPolling(email: string) {
-    // Already polling — no-op
-    if (this.invitationsPollInterval !== null) return;
-    // Poll every 30 seconds
+    if (this.invitationsPollInterval !== null) return; // already polling
     this.invitationsPollInterval = setInterval(() => {
       this.loadPendingInvitations(email);
-    }, 30_000);
+    }, 10_000); // poll every 10 seconds
   }
 
   private stopInvitationPolling() {
@@ -425,7 +425,12 @@ export class App implements OnInit, OnDestroy {
   }
 
   toggleNotifications() {
-     this.showNotifications.set(!this.showNotifications());
+    this.showNotifications.set(!this.showNotifications());
+    // Always refresh when opening so the list is up-to-date
+    if (this.showNotifications()) {
+      const email = this.authService.user()?.email;
+      if (email) this.loadPendingInvitations(email);
+    }
   }
 
   async acceptInvitation(invitationId: string, boardId: string) {
@@ -674,7 +679,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   async submitInvite() {
-    const email = this.inviteEmail().trim();
+    const email = this.inviteEmail().trim().toLowerCase();
     if (!email) return;
     const b = this.activeBoard();
     if (!b) return;
@@ -682,7 +687,8 @@ export class App implements OnInit, OnDestroy {
     this.inviteLoading.set(true);
     this.inviteError.set(null);
     try {
-      await this.supabase.inviteMember(b.id, email);
+      const inviterEmail = this.authService.user()?.email ?? '';
+      await this.supabase.inviteMember(b.id, email, b.title, inviterEmail);
       this.inviteEmail.set('');
       await this.loadBoardMembers();
     } catch (err: any) {

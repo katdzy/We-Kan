@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { createClient, SupabaseClient, Session, User } from '@supabase/supabase-js';
-import { environment } from '../environments/environment';
+import { SupabaseClient, Session, User } from '@supabase/supabase-js';
 import { ThemeKey } from './app';
+import { supabaseClient } from './supabase-client';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
   );
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    this.supabase = supabaseClient;
 
     // Seed from stored session immediately
     this.supabase.auth.getSession().then(({ data }) => {
