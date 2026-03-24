@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit, OnDestroy, effect } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, OnDestroy, effect, ChangeDetectionStrategy } from '@angular/core';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -50,6 +50,7 @@ export interface Column {
   imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App implements OnInit, OnDestroy {
   private supabase = inject(SupabaseService);
@@ -82,6 +83,7 @@ export class App implements OnInit, OnDestroy {
   // ── Activity & Collab state ───────────────────────────────────────────────
   activityLogs = signal<ActivityLog[]>([]);
   boardMembers = signal<BoardMember[]>([]);
+  pendingBoardInvites = signal<BoardInvitation[]>([]);
   showActivityPanel = signal(false);
   showInviteModal = signal(false);
   inviteEmail = signal('');
@@ -199,6 +201,7 @@ export class App implements OnInit, OnDestroy {
         this.columns.set([]);
         this.activityLogs.set([]);
         this.boardMembers.set([]);
+        this.pendingBoardInvites.set([]);
         this.pendingInvitations.set([]);
         this.showNotifications.set(false);
         this.loading.set(false);
@@ -657,6 +660,7 @@ export class App implements OnInit, OnDestroy {
     if (!b) return;
     try {
       this.boardMembers.set(await this.supabase.getBoardMembers(b.id));
+      this.pendingBoardInvites.set(await this.supabase.getBoardInvitations(b.id));
     } catch (err) { console.error('loadBoardMembers', err); }
   }
 
@@ -706,6 +710,15 @@ export class App implements OnInit, OnDestroy {
       await this.loadBoardMembers();
     } catch (err) {
       console.error('removeMember', err);
+    }
+  }
+
+  async removeInvite(inviteId: string) {
+    try {
+      await this.supabase.declineInvitation(inviteId);
+      await this.loadBoardMembers();
+    } catch (err) {
+      console.error('removeInvite', err);
     }
   }
 

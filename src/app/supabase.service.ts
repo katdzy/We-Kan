@@ -462,17 +462,19 @@ export class SupabaseService {
       .eq('board_id', boardId);
     if (error) throw error;
 
-    // Fetch emails via RPC for each member
-    const members: BoardMember[] = [];
-    for (const row of (data ?? []) as { user_id: string; role: string }[]) {
+    // Fetch emails via RPC for each member concurrently
+    const memberPromises = (data ?? []).map(async (row: any) => {
       const { data: emailData } = await this.supabase
         .rpc('get_user_email_by_id', { user_id_input: row.user_id });
-      members.push({
+      
+      return {
         user_id: row.user_id,
         user_email: emailData ?? row.user_id,
         role: row.role as 'owner' | 'member',
-      });
-    }
+      } as BoardMember;
+    });
+
+    const members = await Promise.all(memberPromises);
     return members;
   }
 
@@ -518,13 +520,43 @@ export class SupabaseService {
     } as BoardInvitation));
   }
 
+  async getBoardInvitations(boardId: string): Promise<BoardInvitation[]> {
+    const { data, error } = await this.supabase
+      .from('board_invitations')
+      .select('id, board_id, inviter_id, inviter_email, board_title, invitee_email, created_at')
+      .eq('board_id', boardId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data ?? []).map((row: any) => ({
+      id: row.id,
+      board_id: row.board_id,
+      inviter_id: row.inviter_id,
+      inviter_email: row.inviter_email || 'Someone',
+      invitee_email: row.invitee_email,
+      created_at: row.created_at,
+      board_title: row.board_title || 'a board',
+    } as BoardInvitation));
+  }
+
   async acceptInvitation(invitationId: string, boardId: string, userId: string): Promise<void> {
     // 1. Insert into board_members
-    const { error: insertErr } = await this.supabase.from('board_members').upsert(
-      { board_id: boardId, user_id: userId, role: 'member' },
-      { onConflict: 'board_id,user_id', ignoreDuplicates: true }
-    );
-    if (insertErr) throw insertErr;
+    const { data: existing, error: checkErr } = await this.supabase
+      .from('board_members')
+      .select('id')
+      .eq('board_id', boardId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (!existing) {
+      const { error: insertErr } = await this.supabase.from('board_members').insert({
+        board_id: boardId,
+        user_id: userId,
+        role: 'member'
+      });
+      if (insertErr) throw insertErr;
+    }
 
     // 2. Delete the invitation
     const { error: delErr } = await this.supabase
@@ -562,14 +594,22 @@ export class SupabaseService {
       .channel(`board-${boardId}-${this.sessionId}`)
       .on(
         'postgres_changes',
-        // columns has board_id — safe filter
         { event: '*', schema: 'public', table: 'columns', filter: `board_id=eq.${boardId}` },
         callback
       )
       .on(
         'postgres_changes',
-        // activity_logs has board_id — safe filter
         { event: '*', schema: 'public', table: 'activity_logs', filter: `board_id=eq.${boardId}` },
+        callback
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'board_members', filter: `board_id=eq.${boardId}` },
+        callback
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'board_invitations', filter: `board_id=eq.${boardId}` },
         callback
       )
       .subscribe((status, err) => {
